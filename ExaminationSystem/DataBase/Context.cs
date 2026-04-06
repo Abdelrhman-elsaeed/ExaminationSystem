@@ -7,9 +7,10 @@ namespace ExaminationSystem.DataBase
     {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Data Source=.;Database=ExaminationSystem;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True;");
+            optionsBuilder.UseSqlServer("Data Source=.;Database=ExaminationSystem;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True;")
+                .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
         }
 
-        DbSet<Course> Courses { get; set; }
+        public DbSet<Course> Courses { get; set; }
     }
 }
