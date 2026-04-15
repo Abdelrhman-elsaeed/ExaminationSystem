@@ -1,4 +1,9 @@
 
+using ExaminationSystem.DataBase;
+using ExaminationSystem.Models;
+using ExaminationSystem.Repo;
+using ExaminationSystem.Repo.RepositoryExtension;
+
 namespace ExaminationSystem
 {
     public class Program
@@ -12,6 +17,13 @@ namespace ExaminationSystem
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
+
+            //dependency injection
+            builder.Services.AddScoped<GenericRepository<Course>>();
+            builder.Services.AddScoped<GenericRepository<Question>>();
+            builder.Services.AddScoped<GenericRepository<Choice>>();
+            builder.Services.AddScoped<QuestionRepo>();
+            builder.Services.AddScoped<Context>();
 
             var app = builder.Build();
 

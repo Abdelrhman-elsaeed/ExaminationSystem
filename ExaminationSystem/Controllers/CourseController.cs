@@ -1,5 +1,7 @@
 ﻿using ExaminationSystem.DataBase;
 using ExaminationSystem.Models;
+using ExaminationSystem.ModelVm.Course;
+using ExaminationSystem.Repo;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,55 +13,52 @@ namespace ExaminationSystem.Controllers
     public class CourseController : ControllerBase
     {
 
-        private readonly Context _Context;
+        private readonly GenericRepository<Course> _CourseRepo;
 
-        public CourseController()
+        public CourseController(GenericRepository<Course> CourseRepo)
         {
-            _Context = new Context();
+            _CourseRepo = CourseRepo;
         }
 
         [HttpGet]
-        public async Task<IEnumerable<Course>> GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            return await _Context.Courses
-                .Where(x=>x.Deleted==false)
-                .ToListAsync()
-                .ConfigureAwait(true);
+            return Ok(await _CourseRepo.GetAll().ToListAsync());
         }
-
-
-        [HttpPost]
-        public async Task<bool> Add(Course course)
-        {
-            _Context.Courses.Add(course);
-            await _Context.SaveChangesAsync()
-            .ConfigureAwait(true);
-
-            return true;
-        }
-
 
         [HttpGet]
         public async Task<Course> GetById(int id)
         {
-            return await _Context.Courses.Where(x => x.Deleted == false && x.ID == id )
-                .FirstOrDefaultAsync()
-                .ConfigureAwait(true);
+            return await _CourseRepo.GetByIdAsync(id);
+        }
+
+        [HttpPost]
+        public async Task<bool> Add(Course course)
+        {
+            return await _CourseRepo.AddAsync(course);
         }
 
         [HttpDelete]
         public async Task<bool> Delete(int id)
         {
-            var course = await _Context.Courses
-                .AsTracking()
-                .FirstOrDefaultAsync(x=>x.ID==id);
+            return await _CourseRepo.DeleteAsync(id);
 
-            course.Deleted = true;
+        }
 
-            await _Context.SaveChangesAsync();
+        [HttpPatch]
+        public bool Update(UpdateCourseDTO model)
+        {
 
+            var newUpdates = new Course
+            {
+                ID = model.ID,
+                Name = model.Name,
+                Hours = model.Hours
+            };
+
+            _CourseRepo.UpdateInclude(newUpdates, nameof(Course.Name), nameof(Course.Hours));
             return true;
-
+            
         }
 
     }

@@ -1,13 +1,15 @@
 ﻿namespace ExaminationSystem.Models
 {
-    public class Course
+    public class Course : BaseModel
     {
-        public int ID { get; set; }
 
         public string Name { get; set; }
-
+        public string Description { get; set; }
         public int Hours { get; set; }
 
-        public bool Deleted { get; set; } = false;
+        //navigation properties
+
+        public ICollection<Question> Questions { get; set; }
+        public ICollection<Exam> Exams { get; set; }
     }
 }
