@@ -22,6 +22,9 @@ namespace ExaminationSystem
             builder.Services.AddScoped<GenericRepository<Course>>();
             builder.Services.AddScoped<GenericRepository<Question>>();
             builder.Services.AddScoped<GenericRepository<Choice>>();
+            builder.Services.AddScoped<GenericRepository<Exam>>();
+            builder.Services.AddScoped<GenericRepository<ExamQuestion>>();
+            builder.Services.AddScoped<GenericRepository<Instructor>>();
             builder.Services.AddScoped<QuestionRepo>();
             builder.Services.AddScoped<Context>();
 

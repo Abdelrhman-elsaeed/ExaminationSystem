@@ -45,6 +45,11 @@ namespace ExaminationSystem.Repo
             return savedRows > 0;
         }
 
+        public async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _dbSet.AnyAsync(predicate);
+        }
+
         //----------------------------------------------
         public void UpdateInclude(T model, params string[] modifiedProperties)
         {

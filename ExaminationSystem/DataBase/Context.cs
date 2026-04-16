@@ -31,7 +31,6 @@ namespace ExaminationSystem.DataBase
             // You can remove all the individual .OnDelete(DeleteBehavior.NoAction) 
             // configurations you added in the previous steps since this loop handles them all!
         }
-
         public DbSet<Choice> Choices { get; set; }
         public DbSet<Course> Courses { get; set; }
         public DbSet<Exam> Exams { get; set; }

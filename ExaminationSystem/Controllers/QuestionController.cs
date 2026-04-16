@@ -33,12 +33,14 @@ namespace ExaminationSystem.Controllers
             var NewQuestion = new Question()
             {
                 Title = model.Title,
-                CourseId=model.CourseId,
-                InstructorId=model.InstructorId,
-                Level=model.Level,
+                CourseId = model.CourseId,
+                InstructorId = model.InstructorId,
+                Level = model.Level,
                 Choices = model.Choices.Select(item => new Choice
                 {
-                    Text = item.text
+                    Text = item.text,
+                    IsCorrectChoice = item.IsCorrectChoice
+
 
                 }).ToList()
             };
