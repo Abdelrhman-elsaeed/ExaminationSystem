@@ -13,9 +13,9 @@ namespace ExaminationSystem.Repo
         protected readonly Context _Context;
         protected DbSet<T> _dbSet;
 
-        public GenericRepository()
+        public GenericRepository(Context Context)
         {
-            _Context = new Context();
+            _Context = Context;
             _dbSet = _Context.Set<T>();
         }
         public IQueryable<T> GetAll()
@@ -44,7 +44,6 @@ namespace ExaminationSystem.Repo
 
             return savedRows > 0;
         }
-
         public async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate)
         {
             return await _dbSet.AnyAsync(predicate);
@@ -83,6 +82,14 @@ namespace ExaminationSystem.Repo
                 .ExecuteUpdateAsync(x => x.SetProperty(x => x.Deleted, true));
 
             return updatedRows > 0;
+        }
+
+        public async Task<int> DeleteRangeAsync(Expression<Func<T,bool>> predicate)
+        {
+            var updatedRows = await _dbSet.Where(predicate).Where(x => x.Deleted == false)
+                .ExecuteUpdateAsync(x => x.SetProperty(prop => prop.Deleted, true));
+
+            return updatedRows;
         }
 
     }
