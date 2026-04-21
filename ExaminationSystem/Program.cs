@@ -1,8 +1,9 @@
-
+using AutoMapper;
 using ExaminationSystem.DataBase;
+using ExaminationSystem.Helper;
 using ExaminationSystem.Models;
 using ExaminationSystem.Repo;
-using ExaminationSystem.Repo.RepositoryExtension;
+using ExaminationSystem.Services;
 
 namespace ExaminationSystem
 {
@@ -25,10 +26,15 @@ namespace ExaminationSystem
             builder.Services.AddScoped<GenericRepository<Exam>>();
             builder.Services.AddScoped<GenericRepository<ExamQuestion>>();
             builder.Services.AddScoped<GenericRepository<Instructor>>();
-            builder.Services.AddScoped<QuestionRepo>();
             builder.Services.AddScoped<Context>();
+            builder.Services.AddScoped<QuestionService>();
+            builder.Services.AddScoped<ChoiceService>();
 
+            builder.Services.AddAutoMapper(typeof(Program).Assembly);
             var app = builder.Build();
+
+            //AutoMapper Configuration
+            AutoMapperHelper.Mapper = app.Services.GetRequiredService<IMapper>();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

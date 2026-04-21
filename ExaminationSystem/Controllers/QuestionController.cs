@@ -1,9 +1,13 @@
-﻿using ExaminationSystem.ModelDTO.Choice;
+﻿using ExaminationSystem.Enums;
+using ExaminationSystem.Helper;
+using ExaminationSystem.ModelDTO.Choice;
 using ExaminationSystem.ModelDTO.Question;
 using ExaminationSystem.Models;
 using ExaminationSystem.ModelVm.Question;
 using ExaminationSystem.Repo;
-using ExaminationSystem.Repo.RepositoryExtension;
+using ExaminationSystem.Services;
+using ExaminationSystem.ViewModels;
+using ExaminationSystem.ViewModels.Question;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection.Metadata.Ecma335;
@@ -15,108 +19,70 @@ namespace ExaminationSystem.Controllers
     [Route("[controller]/[action]")]
     public class QuestionController : ControllerBase
     {
-
-        private readonly QuestionRepo _QuestionRepo;
-        private readonly GenericRepository<Choice> _ChoiceRepo;
-        public QuestionController(QuestionRepo QuestionRepo, GenericRepository<Choice> ChoiceRepo)
+        private readonly QuestionService _QuestionService;
+        public QuestionController(QuestionService QuestionService)
         {
-            _QuestionRepo = QuestionRepo;
-            _ChoiceRepo = ChoiceRepo;
+            _QuestionService = QuestionService;
         }
 
         [HttpPut]
-        public async Task<IActionResult> Add(CreateQuestionDTO model)
+        public async Task<ResponseViewModel<CreateQuestionVM>> Add(CreateQuestionVM model)
         {
-
-            //mapping 
-
-            var NewQuestion = new Question()
-            {
-                Title = model.Title,
-                CourseId = model.CourseId,
-                InstructorId = model.InstructorId,
-                Level = model.Level,
-                Choices = model.Choices.Select(item => new Choice
-                {
-                    Text = item.text,
-                    IsCorrectChoice = item.IsCorrectChoice
-
-
-                }).ToList()
-            };
-
-            // call generic repo
-            var result = await _QuestionRepo.AddAsync(NewQuestion);
+            // map VM to DTO
+            var newQuestionDto = model.Map<CreateQuestionDTO>();
+            var result = await _QuestionService.AddAsync(newQuestionDto);
 
             if (result)
-                return Ok("Added Sucessfully");
+                return ResponseViewModel<CreateQuestionVM>.Success(model,message: "Question added successfully.");
             else
-                return NotFound("Not Added Sucessfully");
-
+                return ResponseViewModel<CreateQuestionVM>.Failure(ErrorCode.None,"Question was not added successfully.");
         }
 
         [HttpDelete]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<ResponseViewModel<bool>> Delete(int id)
         {
-            var result = await _QuestionRepo.DeleteQuestionAndChoicesAsync(id);
+            var result = await _QuestionService.DeleteQuestionAndChoicesAsync(id);
 
             if (result)
-                return Ok("Deleted Sucessfully");
+                return ResponseViewModel<bool>.Success(result, message: "Question and Choices Deleted Successfully");
             else
-                return NotFound("Not Deleted Sucessfully");
+                return ResponseViewModel<bool>.Failure(ErrorCode.QustionNotFound,"Unable to delete Question and Choices");
+
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<ResponseViewModel<List<GetAllQuestionVM>>> GetAll()
         {
-            var result = await _QuestionRepo.GetAll()
-                .Select(ques => new GetAllQuestionDTO
-                {
-                    id=ques.ID,
-                    Title = ques.Title,
-                    Choices = ques.Choices.Select(item => new GetAllChoicesDTO
-                    {
-                        text = item.Text
-                    }).ToList()
 
-                }).ToListAsync();
+            // here T = List<GetAllQuestionVM>
 
-            return Ok(result);
+            var allQuestionDTOs = await _QuestionService.GetAllAsync();
+
+            if (allQuestionDTOs is null || !allQuestionDTOs.Any())
+            {
+                return ResponseViewModel<List<GetAllQuestionVM>>.Failure(ErrorCode.QustionNotFound, message: "Questions Not Found");
+            }
+
+            var allQuestionVM = allQuestionDTOs.Select(q => q.Map<GetAllQuestionVM>()).ToList();
+
+            return ResponseViewModel<List<GetAllQuestionVM>>.Success(allQuestionVM, message: "All Questions Returived Successfully");
+
+
         }
 
         [HttpPatch]
-        public async Task<bool> UpdateQuestion(UpdateQuestionDTO model)
+        public async Task<ResponseViewModel<bool>> UpdateQuestion(UpdateQuestionVM model)
         {
 
-            //mapping
-            var newUpdates = new Question
-            {
-                ID=model.ID,
-                Title = model.Title,
-            };
+            var UpdatesDTO = model.Map<UpdateQuestionDTO>();
 
+            var result = await _QuestionService.UpdateQuestionAsync(UpdatesDTO);
 
-            _QuestionRepo.UpdateInclude(newUpdates, nameof(Question.Title));
-
-            return true;
+            if (result)
+                return ResponseViewModel<bool>.Success(result, message: "Questoin Updated Successfully");
+            else
+                return ResponseViewModel<bool>.Failure(ErrorCode.QuestionUpdateFail, message: "Questoin Fail to Update Successfully");
         }
 
-        [HttpPatch]
-        public async Task<bool> UpdateChoice(UpdateChoiceDTO model)
-        {
-            //mappinng
-
-            var ChoiceUpdated = new Choice()
-            {
-                ID = model.ID,
-                Text = model.Text
-            };
-
-            //call repo
-            _ChoiceRepo.UpdateInclude(ChoiceUpdated, nameof(Choice.Text));
-            //return result
-            return true;
-
-        }
     }
 }
