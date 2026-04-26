@@ -18,6 +18,10 @@ namespace ExaminationSystem.DTOs.Choice
             CreateMap<GetAllChoicesVM, GetAllChoicesDTO>().ReverseMap();
             
             CreateMap<ExaminationSystem.Models.Choice, GetChoicesDTO>();
+            CreateMap<UpdateChoiceDTO, ExaminationSystem.Models.Choice>().ReverseMap();
+            CreateMap<UpdateChoiceVM, UpdateChoiceDTO>().ReverseMap();
+
+
 
             CreateMap<GetChoicesDTO, ExaminationSystem.Models.Choice>().ReverseMap();
             
