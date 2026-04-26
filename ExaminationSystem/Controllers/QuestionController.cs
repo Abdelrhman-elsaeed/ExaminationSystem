@@ -7,6 +7,7 @@ using ExaminationSystem.ModelVm.Question;
 using ExaminationSystem.Repo;
 using ExaminationSystem.Services;
 using ExaminationSystem.ViewModels;
+using ExaminationSystem.ViewModels.Choice;
 using ExaminationSystem.ViewModels.Question;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -19,70 +20,83 @@ namespace ExaminationSystem.Controllers
     [Route("[controller]/[action]")]
     public class QuestionController : ControllerBase
     {
-        private readonly QuestionService _QuestionService;
-        public QuestionController(QuestionService QuestionService)
-        {
-            _QuestionService = QuestionService;
-        }
+        //private readonly QuestionService _QuestionService;
+        //public QuestionController(QuestionService QuestionService)
+        //{
+        //    _QuestionService = QuestionService;
+        //}
 
-        [HttpPut]
-        public async Task<ResponseViewModel<CreateQuestionVM>> Add(CreateQuestionVM model)
-        {
-            // map VM to DTO
-            var newQuestionDto = model.Map<CreateQuestionDTO>();
-            var result = await _QuestionService.AddAsync(newQuestionDto);
+        //[HttpPut]
+        //public async Task<ResponseViewModel<CreateQuestionVM>> Add(CreateQuestionVM model)
+        //{
+        //    // map VM to DTO
+        //    var newQuestionDto = model.Map<CreateQuestionDTO>();
+        //    var result = await _QuestionService.AddAsync(newQuestionDto);
 
-            if (result)
-                return ResponseViewModel<CreateQuestionVM>.Success(model,message: "Question added successfully.");
-            else
-                return ResponseViewModel<CreateQuestionVM>.Failure(ErrorCode.None,"Question was not added successfully.");
-        }
+        //    if (result)
+        //        return ResponseViewModel<CreateQuestionVM>.Success(model,message: "Question added successfully.");
+        //    else
+        //        return ResponseViewModel<CreateQuestionVM>.Failure(ErrorCode.None,"Question was not added successfully.");
+        //}
 
-        [HttpDelete]
-        public async Task<ResponseViewModel<bool>> Delete(int id)
-        {
-            var result = await _QuestionService.DeleteQuestionAndChoicesAsync(id);
+        //[HttpDelete]
+        //public async Task<ResponseViewModel<bool>> Delete(int id)
+        //{
+        //    var result = await _QuestionService.DeleteQuestionAndChoicesAsync(id);
 
-            if (result)
-                return ResponseViewModel<bool>.Success(result, message: "Question and Choices Deleted Successfully");
-            else
-                return ResponseViewModel<bool>.Failure(ErrorCode.QustionNotFound,"Unable to delete Question and Choices");
+        //    if (result)
+        //        return ResponseViewModel<bool>.Success(result, message: "Question and Choices Deleted Successfully");
+        //    else
+        //        return ResponseViewModel<bool>.Failure(ErrorCode.QustionNotFound,"Unable to delete Question and Choices");
 
-        }
+        //}
 
-        [HttpGet]
-        public async Task<ResponseViewModel<List<GetAllQuestionVM>>> GetAll()
-        {
+        //[HttpGet]
+        //public async Task<ResponseViewModel<List<GetAllQuestionVM>>> GetAll()
+        //{
 
-            // here T = List<GetAllQuestionVM>
+        //    // here T = List<GetAllQuestionVM>
 
-            var allQuestionDTOs = await _QuestionService.GetAllAsync();
+        //    var allQuestionDTOs = await _QuestionService.GetAllAsync();
 
-            if (allQuestionDTOs is null || !allQuestionDTOs.Any())
-            {
-                return ResponseViewModel<List<GetAllQuestionVM>>.Failure(ErrorCode.QustionNotFound, message: "Questions Not Found");
-            }
+        //    if (allQuestionDTOs is null || !allQuestionDTOs.Any())
+        //    {
+        //        return ResponseViewModel<List<GetAllQuestionVM>>.Failure(ErrorCode.QustionNotFound, message: "Questions Not Found");
+        //    }
 
-            var allQuestionVM = allQuestionDTOs.Select(q => q.Map<GetAllQuestionVM>()).ToList();
+        //    var allQuestionVM = allQuestionDTOs.Select(q => q.Map<GetAllQuestionVM>()).ToList();
 
-            return ResponseViewModel<List<GetAllQuestionVM>>.Success(allQuestionVM, message: "All Questions Returived Successfully");
+        //    return ResponseViewModel<List<GetAllQuestionVM>>.Success(allQuestionVM, message: "All Questions Returived Successfully");
 
 
-        }
+        //}
 
-        [HttpPatch]
-        public async Task<ResponseViewModel<bool>> UpdateQuestion(UpdateQuestionVM model)
-        {
+        //[HttpPatch]
+        //public async Task<ResponseViewModel<bool>> UpdateQuestion(UpdateQuestionVM model)
+        //{
 
-            var UpdatesDTO = model.Map<UpdateQuestionDTO>();
+        //    var UpdatesDTO = model.Map<UpdateQuestionDTO>();
 
-            var result = await _QuestionService.UpdateQuestionAsync(UpdatesDTO);
+        //    var result = await _QuestionService.UpdateQuestionAsync(UpdatesDTO);
 
-            if (result)
-                return ResponseViewModel<bool>.Success(result, message: "Questoin Updated Successfully");
-            else
-                return ResponseViewModel<bool>.Failure(ErrorCode.QuestionUpdateFail, message: "Questoin Fail to Update Successfully");
-        }
+        //    if (result)
+        //        return ResponseViewModel<bool>.Success(result, message: "Questoin Updated Successfully");
+        //    else
+        //        return ResponseViewModel<bool>.Failure(ErrorCode.QuestionUpdateFail, message: "Questoin Fail to Update Successfully");
+        //}
+
+        //[HttpPatch]
+        //public async Task<ResponseViewModel<bool>> UpdateChoice (UpdateChoiceVM model)
+        //{
+        //    var UpdateDTO = model.Map<UpdateChoiceDTO>();
+
+        //    var result = await _QuestionService.UpdateChoiceAsync(UpdateDTO);
+
+        //    if (result)
+        //        return ResponseViewModel<bool>.Success(result, message: "Choice Updated Successfully");
+        //    else
+        //        return ResponseViewModel<bool>.Failure(ErrorCode.ChoiceUpdateFail, message: "Choice fail to update");
+        //}
 
     }
 }

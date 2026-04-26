@@ -1,5 +1,6 @@
 ﻿using ExaminationSystem.DataBase;
 using ExaminationSystem.DTOs.Question;
+using ExaminationSystem.Enums;
 using ExaminationSystem.Helper;
 using ExaminationSystem.ModelDTO.Choice;
 using ExaminationSystem.ModelDTO.Question;
@@ -7,6 +8,8 @@ using ExaminationSystem.Models;
 using ExaminationSystem.ModelVm.Course;
 using ExaminationSystem.ModelVm.Question;
 using ExaminationSystem.Repo;
+using ExaminationSystem.ViewModels;
+using ExaminationSystem.ViewModels.Choice;
 using ExaminationSystem.ViewModels.Question;
 using Microsoft.EntityFrameworkCore;
 using System.Transactions;
@@ -23,7 +26,7 @@ namespace ExaminationSystem.Services
             _QuestionRepo = QuestionRepo;
             _ChoiceService = ChoiceService;
         }
-        public async Task<bool> AddAsync(CreateQuestionDTO model)
+        public async Task<ResponseViewModel<bool>> AddAsync(CreateQuestionDTO model)
         {
             //Mapping (DTO to Model)
 
@@ -32,30 +35,39 @@ namespace ExaminationSystem.Services
             //Call Question Repo 
             var result = await _QuestionRepo.AddAsync(newQuestion);
 
-            return result;
+            if (result)
+                return ResponseViewModel<bool>.Success(result, ErrorCode.None, message: "Question Added Successfully");
+            else
+                return ResponseViewModel<bool>.Failure(ErrorCode.QuestionAddFail, message: "Failed to add the question. Please try again");
         }
 
-        public async Task<GetQuestionDTO?> GetAsync(int id)
+        public async Task<ResponseViewModel<GetQuestionDTO>> GetAsync(int id)
         {
-            //Question validation
-            // The result will be null if the question wasn't found, 
-            // which can easily be checked in Controller to return a 404 Not Found.
 
             var question = await _QuestionRepo.Get(x => x.ID == id && x.Deleted == false)
                 .FirstOrDefaultAsync();
-            return question.Map<GetQuestionDTO>();
+            var result = question.Map<GetQuestionDTO>();
+
+            if (result != null)
+                return ResponseViewModel<GetQuestionDTO>.Success(result, ErrorCode.None, message: "Question retrieved successfully");
+            else
+                return ResponseViewModel<GetQuestionDTO>.Failure(ErrorCode.QustionNotFound, message: "Question not found");
+
         }
 
-        public async Task<IEnumerable<GetAllQuestionDTO>> GetAllAsync()
+        public async Task<ResponseViewModel<IEnumerable<GetAllQuestionDTO>>> GetAllAsync()
         {
             var AllQuestions = await _QuestionRepo.GetAll()
                 .Project<GetAllQuestionDTO>()
                 .ToListAsync();
 
-            return AllQuestions;
+            if (AllQuestions.Count > 0) 
+                return ResponseViewModel<IEnumerable<GetAllQuestionDTO>>.Success(AllQuestions, ErrorCode.None, message: "Questions retrieved successfully");
+            else
+                return ResponseViewModel<IEnumerable<GetAllQuestionDTO>>.Failure(ErrorCode.QustionNotFound, message: "No questions found");
         }
 
-        public async Task<bool> DeleteQuestionAndChoicesAsync(int id)
+        public async Task<ResponseViewModel<bool>> DeleteQuestionAndChoicesAsync(int id)
         {
             // TransactionScope keeps DB logic out of the service layer
             using var DeleteTransaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
@@ -64,39 +76,72 @@ namespace ExaminationSystem.Services
             {
                 // Delete Question
                 var QuestionResult = await _QuestionRepo.DeleteAsync(id);
-                if (!QuestionResult) return false;
+                if (!QuestionResult) 
+                    return ResponseViewModel<bool>.Failure(ErrorCode.QuestionDeleteFail,message: "Failed to delete the question");
 
                 //Delete Question Choices
                 var ChoicesResult = await _ChoiceService.DeleteByQuestionIdAsync(id);
+                if(!ChoicesResult)
+                    return ResponseViewModel<bool>.Failure(ErrorCode.ChoiceDeleteFail, message: "Failed to delete the choices");
 
                 //commit Transaction
                 DeleteTransaction.Complete();
-                return true;
+                return  ResponseViewModel<bool>.Success(true, message: "Question and choices Deleted Successfully");
 
             }
             catch
             {
                 // Automatically rolls back if Complete() is not called
-                throw;
+                return ResponseViewModel<bool>.Failure(ErrorCode.QuestoinChoicesTransactionFail, message: "Unexpected error while deleting question and choices");
 
             }
         }
 
-        public async Task<bool> UpdateQuestionAsync(UpdateQuestionDTO model)
+        public async Task<ResponseViewModel<bool>> UpdateQuestionAsync(UpdateQuestionDTO model)
         {
             //validate question exist 
-            var IsQuestionExist = await _QuestionRepo.AnyAsync(x => x.ID == model.ID);
-            if (!IsQuestionExist) return false;
+            var IsQuestionExist = await _QuestionRepo.AnyAsync(x => x.ID == model.ID && x.Deleted == false);
+            if (!IsQuestionExist) 
+                return ResponseViewModel<bool>.Failure(ErrorCode.QustionNotFound, message: "Failed to find the question");
 
             //mapping 
             var NewUpdates = model.Map<Question>();
             
             //call repo
-            _QuestionRepo.UpdateInclude(NewUpdates, nameof(Question.Title),nameof(Question.Level));
+            var result = await _QuestionRepo.UpdateInclude(NewUpdates, nameof(Question.Title),nameof(Question.Level));
 
             // return result 
-            return true;
+            if (result)
+                return ResponseViewModel<bool>.Success(result, ErrorCode.None, message: "Question Updated Successfully");
+            else
+                return ResponseViewModel<bool>.Failure(ErrorCode.QuestionUpdateFail, message: "Question failed to Update");
+
         }
+
+        public async Task<ResponseViewModel<bool>> UpdateChoiceAsync(UpdateChoiceDTO model)
+        {
+            //validate Choice exist 
+            var IsChoiceExist = await _ChoiceService.AnyAsync(model.ID);
+            if (!IsChoiceExist)
+                return ResponseViewModel<bool>.Failure(ErrorCode.ChoiceNotFound, message: "Failed to find the choice");
+
+
+            var result = await _ChoiceService.UpdateChoiceAsync(model);
+
+            // return result 
+            if (result)
+                return ResponseViewModel<bool>.Success(result, ErrorCode.None, message: "Choice Updated Successfully");
+            else
+                return ResponseViewModel<bool>.Failure(ErrorCode.ChoiceUpdateFail, message: "Choice failed to Update");
+
+        }
+
+        public async Task<bool> IsExistAsync(int id)
+        {
+            return await _QuestionRepo.AnyAsync(q => q.ID == id && q.Deleted == false);
+        }
+
+        
 
     }
 }

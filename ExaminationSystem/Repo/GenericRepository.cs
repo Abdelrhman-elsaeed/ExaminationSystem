@@ -50,10 +50,10 @@ namespace ExaminationSystem.Repo
         }
 
         //----------------------------------------------
-        public void UpdateInclude(T model, params string[] modifiedProperties)
+        public async Task<bool> UpdateInclude(T model, params string[] modifiedProperties)
         {
-            if (!_dbSet.Any(x => x.ID == model.ID && !x.Deleted))
-                return ;
+            if (!await _dbSet.AnyAsync(x => x.ID == model.ID && !x.Deleted))
+                return false ;
 
             var local = _dbSet.Local.FirstOrDefault(x => x.ID == model.ID);
             EntityEntry entityEntry;
@@ -72,7 +72,8 @@ namespace ExaminationSystem.Repo
                 }
             }
 
-            _Context.SaveChanges();
+            var savedRows = await _Context.SaveChangesAsync();
+            return savedRows > 0;
 
         }
         public async Task<bool> DeleteAsync(int id)
@@ -83,7 +84,6 @@ namespace ExaminationSystem.Repo
 
             return updatedRows > 0;
         }
-
         public async Task<int> DeleteRangeAsync(Expression<Func<T,bool>> predicate)
         {
             var updatedRows = await _dbSet.Where(predicate).Where(x => x.Deleted == false)
