@@ -1,6 +1,7 @@
 ﻿using ExaminationSystem.DataBase;
 using ExaminationSystem.DTOs.Question;
 using ExaminationSystem.Enums;
+using ExaminationSystem.Enums.Question;
 using ExaminationSystem.Helper;
 using ExaminationSystem.ModelDTO.Choice;
 using ExaminationSystem.ModelDTO.Question;
@@ -141,6 +142,39 @@ namespace ExaminationSystem.Services
             return await _QuestionRepo.AnyAsync(q => q.ID == id && q.Deleted == false);
         }
 
+        public async Task<IEnumerable<GetQuestionRelatedToCourseDTO>> GetQuestionsByCourseId(int CourseId)
+        {
+            return await _QuestionRepo.Get(q => q.CourseId == CourseId && !q.Deleted)
+               .Project<GetQuestionRelatedToCourseDTO>()
+               .ToListAsync();
+        }
+
+        public async Task<List<int>> GetRandomQuestionIdsByCourseAndLevelAsync(int courseId,QuestionLevel level,int count,ICollection<int>? excludedQuestionIds = null)
+        {
+            //excludedQuestionIds this list we will (store ids that we have before) to prevent Duplications.
+
+            if (courseId <= 0 || count <= 0)
+                return new List<int>();
+
+            //initial query
+            var query = _QuestionRepo.Get(q =>
+                q.CourseId == courseId &&
+                !q.Deleted &&
+                q.Level == level);
+
+
+            if (excludedQuestionIds is not null && excludedQuestionIds.Count > 0)
+            {
+                query = query.Where(q => !excludedQuestionIds.Contains(q.ID));
+            }
+
+            //final query
+            return await query
+                .OrderBy(q => Guid.NewGuid())
+                .Select(q => q.ID)
+                .Take(count)
+                .ToListAsync();
+        }
         
 
     }

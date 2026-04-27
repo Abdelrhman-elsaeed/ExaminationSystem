@@ -44,6 +44,18 @@ namespace ExaminationSystem.Repo
 
             return savedRows > 0;
         }
+        public async Task<bool> AddRangeAsync(IEnumerable<T> models)
+        {
+            var modelList = models?.ToList();
+
+            if (modelList is null || modelList.Count == 0)
+                return false;
+
+            _dbSet.AddRange(modelList);
+            var savedRows = await _Context.SaveChangesAsync();
+
+            return savedRows > 0;
+        }
         public async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate)
         {
             return await _dbSet.AnyAsync(predicate);
