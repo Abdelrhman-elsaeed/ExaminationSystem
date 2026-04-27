@@ -1,16 +1,17 @@
 ﻿using ExaminationSystem.DTOs.Exam;
 using ExaminationSystem.DTOs.ExamStudent;
 using ExaminationSystem.DTOs.Question;
+using ExaminationSystem.Enums;
 using ExaminationSystem.Enums.Exam;
 using ExaminationSystem.Helper;
 using ExaminationSystem.ModelDTO.Exam;
 using ExaminationSystem.Models;
 using ExaminationSystem.Repo;
+using ExaminationSystem.ViewModels;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using ExaminationSystem.Enums;
-using ExaminationSystem.ViewModels;
+using System.Transactions;
 
 namespace ExaminationSystem.Services
 {
@@ -247,6 +248,68 @@ namespace ExaminationSystem.Services
 
             // return Grade
             return ResponseViewModel<decimal>.Success(FinalGrade, ErrorCode.None, "Exam submitted successfully");
+        }
+
+        public async Task<ResponseViewModel<bool>> RandomExam(CreateRandomExamDTO model)
+        {
+            // 1. Validation
+            if (model is null || model.ExamId <= 0 || model.CourseId <= 0 || model.QuestionsConfig is null || !model.QuestionsConfig.Any())
+                return ResponseViewModel<bool>.Failure(ErrorCode.InvalidExamInput, "Invalid input configuration");
+
+            if (model.QuestionsConfig.Any(c => c.Count <= 0 || c.GradePerQuestion <= 0))
+                return ResponseViewModel<bool>.Failure(ErrorCode.InvalidExamInput, "Invalid question config values");
+
+            var isExamExist = await IsExist(model.ExamId);
+            if (!isExamExist)
+                return ResponseViewModel<bool>.Failure(ErrorCode.ExamNotFound, "Exam not found");
+
+            var isCourseExist = await _CourseService.IsExist(model.CourseId);
+            if (!isCourseExist)
+                return ResponseViewModel<bool>.Failure(ErrorCode.CourseNotFound, "Course not found");
+
+            // 2. Random selection from DB per level
+            var selectedQuestionIds = new HashSet<int>();
+            var questionsToAssign = new List<AssignQuestionToExamDTO>();
+
+            foreach (var config in model.QuestionsConfig)
+            {
+                var randomQuestionIds = await _QuestionService.GetRandomQuestionIdsByCourseAndLevelAsync(
+                    model.CourseId,
+                    config.Level,
+                    config.Count,
+                    selectedQuestionIds.ToList());
+
+                if (randomQuestionIds.Count < config.Count)
+                    return ResponseViewModel<bool>.Failure(
+                        ErrorCode.InvalidExamInput,
+                        $"Not enough questions available for level {config.Level}. Requested: {config.Count}, Available: {randomQuestionIds.Count}");
+
+                foreach (var questionId in randomQuestionIds)
+                {
+                    selectedQuestionIds.Add(questionId);
+
+                    questionsToAssign.Add(new AssignQuestionToExamDTO
+                    {
+                        ExamId = model.ExamId,
+                        QuestionId = questionId,
+                        Grade = config.GradePerQuestion
+                    });
+                }
+            }
+
+            // 3. assign Questions to exam
+            try
+            {
+                var assignResult = await _ExamQuestionService.AddRangeAsync(questionsToAssign);
+                if (!assignResult)
+                    return ResponseViewModel<bool>.Failure(ErrorCode.AssignQuestionToExamFail, "Failed to assign questions to the exam");
+
+                return ResponseViewModel<bool>.Success(true, ErrorCode.None, "Random exam generated and questions assigned successfully");
+            }
+            catch (Exception)
+            {
+                return ResponseViewModel<bool>.Failure(ErrorCode.AssignQuestionToExamFail, "Unexpected error occurred while assigning questions");
+            }
         }
     }
 }

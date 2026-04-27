@@ -1,7 +1,9 @@
 ﻿using ExaminationSystem.DTOs.ExamStudent;
+using ExaminationSystem.Enums;
 using ExaminationSystem.Helper;
 using ExaminationSystem.Models;
 using ExaminationSystem.Repo;
+using ExaminationSystem.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace ExaminationSystem.Services
@@ -45,6 +47,72 @@ namespace ExaminationSystem.Services
                 x.ExamId == examId &&
                 x.StudentId == studentId &&
                 x.Deleted == false);
+        }
+
+        public async Task<ResponseViewModel<decimal?>> StudentFinalGrade(int StudentId, int ExamId)
+        {
+            if(StudentId <= 0 || ExamId <= 0)
+                return ResponseViewModel<decimal?>.Failure(ErrorCode.InvalidExamInput, "Invalid exam/student input");
+
+            var isRecordExist = await IsStudentAssignedToExamAsync(ExamId, StudentId);
+            if (!isRecordExist)
+                return ResponseViewModel<decimal?>.Failure(ErrorCode.StudentNotAssignedToExam, "Student is not assigned to this exam");
+
+            var result = await _ExamStudentRepo
+                .Get(x => x.StudentId == StudentId && x.ExamId == ExamId && !x.Deleted)
+                .Select(x => x.FinalGrade)
+                .FirstOrDefaultAsync();
+
+            return ResponseViewModel<decimal?>.Success(result, ErrorCode.None, message: "Final Grade Retrieved Successfully");
+        }
+
+        public async Task<ResponseViewModel<IEnumerable<ViewStudentsGradesDTO> >> ViewStudentsGrades(int ExamId)
+        {
+            if (ExamId <= 0)
+                return ResponseViewModel<IEnumerable<ViewStudentsGradesDTO>>.Failure(ErrorCode.InvalidExamInput, "Invalid exam input");
+
+            var result = await _ExamStudentRepo.Get(es => es.ExamId == ExamId && !es.Deleted)
+                .OrderByDescending(es=>es.FinalGrade)
+                .Select(es => new ViewStudentsGradesDTO()
+                {
+                    ID = es.ID,
+                    StudentId = es.StudentId,
+                    ExamId = es.ExamId,
+                    StudentName = es.Student.Name,
+                    FinalGrade = es.FinalGrade
+
+                }).ToListAsync();
+
+            return ResponseViewModel<IEnumerable<ViewStudentsGradesDTO>>.Success(result, ErrorCode.None, message: "Final Grade Retrieved Successfully");
+        }
+
+        public async Task<ResponseViewModel<decimal?>> TopGrade(int ExamId)
+        {
+            if (ExamId <= 0)
+                return ResponseViewModel<decimal?>.Failure(ErrorCode.InvalidExamInput, "Invalid exam input");
+
+            var result = await _ExamStudentRepo.Get(es => es.ExamId == ExamId && !es.Deleted && es.FinalGrade.HasValue)
+                .OrderByDescending(es => es.FinalGrade)
+                .Select(es => es.FinalGrade)
+                .FirstOrDefaultAsync();
+
+            return ResponseViewModel<decimal?>.Success(result, ErrorCode.None, "Top grade retrieved successfully");
+        }
+
+        public async Task<ResponseViewModel<decimal?>> AverageGrade(int ExamId)
+        {
+            if (ExamId <= 0)
+                return ResponseViewModel<decimal?>.Failure(ErrorCode.InvalidExamInput, "Invalid exam input");
+
+            var result = await _ExamStudentRepo.Get(es => es.ExamId == ExamId && !es.Deleted && es.FinalGrade.HasValue)
+                .Select(es=>es.FinalGrade)
+                .AverageAsync();
+
+
+            if (result == null)
+                return ResponseViewModel<decimal?>.Failure(ErrorCode.StudentNotAssignedToExam, "No graded students found for this exam");
+
+            return ResponseViewModel<decimal?>.Success(result, ErrorCode.None, "Average grade retrieved successfully");
         }
     }
 }

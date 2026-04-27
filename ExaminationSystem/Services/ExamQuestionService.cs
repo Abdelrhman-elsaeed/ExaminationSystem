@@ -28,6 +28,17 @@ namespace ExaminationSystem.Services
 
             return await _ExamQuestionRepo.AddAsync(AssignModel);
         }
+        public async Task<bool> AddRangeAsync(IEnumerable<AssignQuestionToExamDTO> models)
+        {
+            var mappedModels = models?
+                .Select(m => m.Map<ExamQuestion>())
+                .ToList();
+
+            if (mappedModels is null || mappedModels.Count == 0)
+                return false;
+
+            return await _ExamQuestionRepo.AddRangeAsync(mappedModels);
+        }
         public async Task<bool> IsExist(int id)
         {
             return await _ExamQuestionRepo.AnyAsync(q => q.ID == id && q.Deleted==false);
