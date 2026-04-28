@@ -1,7 +1,8 @@
-﻿using ExaminationSystem.DTOs.Question;
+﻿using ExaminationSystem.DTOs.ExamQuestion;
+using ExaminationSystem.DTOs.Question;
 using ExaminationSystem.Helper;
 using ExaminationSystem.ModelDTO.Choice;
-using ExaminationSystem.ModelDTO.Exam;
+using ExaminationSystem.ModelDTO.ExamQuestion;
 using ExaminationSystem.Models;
 using ExaminationSystem.Repo;
 using Microsoft.EntityFrameworkCore;
@@ -92,6 +93,18 @@ namespace ExaminationSystem.Services
                     .FirstOrDefault()
 
                 }).ToListAsync();
+        }
+
+        public async Task<bool> UpdateQuestionOnExam(UpdateExamQuestionDTO model)
+        {
+            //1-validate ExamQuestion Record Exist
+            var IsExist = await this.IsExist(model.ID);
+            if (!IsExist)
+                return false;
+
+            var result = model.Map<ExamQuestion>();
+            return await _ExamQuestionRepo.UpdateInclude(result,nameof(ExamQuestion.Grade));
+
         }
 
 

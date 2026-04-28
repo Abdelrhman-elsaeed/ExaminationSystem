@@ -1,8 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace ExaminationSystem.ModelDTO.Exam
+﻿namespace ExaminationSystem.ViewModels.ExamQuestion
 {
-    public class AssignQuestionToExamDTO
+    public class AssignQuestionToExamVM
     {
         public int Grade { get; set; }
         public int ExamId { get; set; }

@@ -1,11 +1,14 @@
 ﻿using ExaminationSystem.DTOs.Exam;
+using ExaminationSystem.DTOs.ExamQuestion;
 using ExaminationSystem.DTOs.ExamStudent;
 using ExaminationSystem.DTOs.Question;
 using ExaminationSystem.Enums;
 using ExaminationSystem.Enums.Exam;
 using ExaminationSystem.Helper;
 using ExaminationSystem.ModelDTO.Exam;
+using ExaminationSystem.ModelDTO.ExamQuestion;
 using ExaminationSystem.Models;
+using ExaminationSystem.ModelVm.Question;
 using ExaminationSystem.Repo;
 using ExaminationSystem.ViewModels;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -60,7 +63,7 @@ namespace ExaminationSystem.Services
 
         //------------------------------------------------------
 
-        public async Task<ResponseViewModel<bool>> Add(CreateExamDTO model)
+        public async Task<ResponseViewModel<bool>> AddAsync(CreateExamDTO model)
         {
             if (model is null || model.CourseId <= 0 || model.InstructorId <= 0)
                 return ResponseViewModel<bool>.Failure(ErrorCode.InvalidExamInput, "Invalid exam input");
@@ -87,7 +90,7 @@ namespace ExaminationSystem.Services
             return await _ExamRepo.AnyAsync(ex => ex.ID == id && ex.Deleted == false);
         }
 
-        public async Task<ResponseViewModel<bool>> Delete(int id)
+        public async Task<ResponseViewModel<bool>> DeleteAsync(int id)
         {
             if (id <= 0)
                 return ResponseViewModel<bool>.Failure(ErrorCode.InvalidExamInput, "Invalid exam id");
@@ -103,7 +106,7 @@ namespace ExaminationSystem.Services
             return ResponseViewModel<bool>.Success(true, ErrorCode.None, "Exam deleted successfully");
         }
 
-        public async Task<ResponseViewModel<bool>> Update(UpdateExamDTO model)
+        public async Task<ResponseViewModel<bool>> UpdateAsync(UpdateExamDTO model)
         {
             if (model is null || model.ID <= 0)
                 return ResponseViewModel<bool>.Failure(ErrorCode.InvalidExamInput, "Invalid exam input");
@@ -149,6 +152,18 @@ namespace ExaminationSystem.Services
                 return ResponseViewModel<bool>.Failure(ErrorCode.AssignQuestionToExamFail, "Failed to assign question to exam");
 
             return ResponseViewModel<bool>.Success(true, ErrorCode.None, "Question assigned to exam successfully");
+        }
+
+        public async Task<ResponseViewModel<bool>> UpdateQuestionOnExam(UpdateExamQuestionDTO model)
+        {
+            if (model is null || model.ID <= 0)
+                return ResponseViewModel<bool>.Failure(ErrorCode.InvalidExamInput, "Invalid input");
+
+            var result = await _ExamQuestionService.UpdateQuestionOnExam(model);
+            if (!result)
+                return ResponseViewModel<bool>.Failure(ErrorCode.AssignQuestionToExamFail, "Failed to update question on exam");
+
+            return ResponseViewModel<bool>.Success(true, ErrorCode.None, "Question updated on exam successfully");
         }
 
         public async Task<ResponseViewModel<bool>> DeleteQuestoinFromExam(int examQuestionRecordId)
