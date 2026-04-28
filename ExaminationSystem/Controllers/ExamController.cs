@@ -1,8 +1,14 @@
-﻿using ExaminationSystem.ModelDTO.Exam;
+﻿using ExaminationSystem.DTOs.ExamQuestion;
+using ExaminationSystem.Helper;
+using ExaminationSystem.ModelDTO.Exam;
 using ExaminationSystem.ModelDTO.ExamQuestion;
 using ExaminationSystem.Models;
 using ExaminationSystem.Repo;
+using ExaminationSystem.Services;
+using ExaminationSystem.ViewModels.Exam;
+using ExaminationSystem.ViewModels.ExamQuestion;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using System.Reflection.Metadata;
 
 namespace ExaminationSystem.Controllers
@@ -12,60 +18,84 @@ namespace ExaminationSystem.Controllers
     [Route("[controller]/[action]")]
     public class ExamController : ControllerBase
     {
-        private readonly GenericRepository<Exam> _ExamRepo;
-        private readonly GenericRepository<Course> _CourseRepo;
-        private readonly GenericRepository<Question> _QuestionRepo;
-        private readonly GenericRepository<ExamQuestion> _ExamQuestionRepo;
-        private readonly GenericRepository<Instructor> _InstructorRepo;
-        public ExamController(GenericRepository<Exam> ExamRepo, GenericRepository<ExamQuestion> ExamQuestionRepo, GenericRepository<Course> CourseRepo,GenericRepository<Instructor> InstructorRepo, GenericRepository<Question> questionRepo)
+        private readonly ExamService _ExamService;
+        public ExamController(ExamService ExamService)
         {
-            _ExamRepo = ExamRepo;
-            _ExamQuestionRepo = ExamQuestionRepo;
-            _CourseRepo = CourseRepo;
-            _InstructorRepo = InstructorRepo;
-            _QuestionRepo = questionRepo;
+            _ExamService = ExamService;
         }
 
 
-        //[HttpPut]
-        //public async Task<IActionResult> Add(CreateExamDTO model)
-        //{
+        [HttpPut]
+        public async Task<IActionResult> Add(CreateExamVM model)
+        {
+            var CreateExamDTO = model.Map<CreateExamDTO>();
 
+            var resutl = await _ExamService.AddAsync(CreateExamDTO);
 
+            if (resutl.IsSuccess)
+                return Ok(resutl);
+            else
+                return NotFound(resutl);
+        }
 
-        //}
+        [HttpPut]
+        public async Task<IActionResult> AssignQuestionToExam(AssignQuestionToExamVM model)
+        {
+            var AssignQuesionDTO = model.Map<AssignQuestionToExamDTO>();
 
-        //[HttpPut]
-        //public async Task<IActionResult> AssignQuestionToExam(AssignQuestionToExamDTO model)
-        //{
+            var result = await _ExamService.AssignQuestionToExam(AssignQuesionDTO);
 
+            if (result.IsSuccess)
+                return Ok(result);
+            else
+                return NotFound(result);
 
-        //}
+        }
 
-        //[HttpPatch]
-        //public async Task<IActionResult> Update(UpdateExamDTO model)
-        //{
-            
-           
-        //}
+        [HttpPatch]
+        public async Task<IActionResult> Update(UpdateExamVM model)
+        {
+            var UpdateDTO = model.Map<UpdateExamDTO>();
 
-        //[HttpDelete]
-        //public async Task<IActionResult> DeleteExam(int id)
-        //{
-           
-        //}
+            var result = await _ExamService.UpdateAsync(UpdateDTO);
 
-        //[HttpPatch]
-        //public async Task<IActionResult> UpdateQuestionOnExam(UpdateExamQuestionDTO model)
-        //{
-            
-        //}
+            if (result.IsSuccess)
+                return Ok(result);
+            else
+                return NotFound(result);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteExam(int id)
+        {
+            var resutl = await _ExamService.DeleteAsync(id);
+
+            if (resutl.IsSuccess)
+                return Ok(resutl);
+            else
+                return NotFound(resutl);
+        }
+
+        [HttpPatch]
+        public async Task<IActionResult> UpdateQuestionOnExam(UpdateExamQuestionVM model)
+        {
+            var UpdateDTO = model.Map<UpdateExamQuestionDTO>();
+
+            var resutl = await _ExamService.UpdateQuestionOnExam(UpdateDTO);
+
+            if (resutl.IsSuccess)
+                return Ok(resutl);
+            else
+                return NotFound(resutl);
+        }
 
         //[HttpDelete]
         //public async Task<IActionResult> DeleteQuestionFromExam(int id)
         //{
-            
+
         //}
+
+        // exam view , random , report results , submit
 
     }
 }

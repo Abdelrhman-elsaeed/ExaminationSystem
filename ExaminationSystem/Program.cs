@@ -1,6 +1,7 @@
 using AutoMapper;
 using ExaminationSystem.DataBase;
 using ExaminationSystem.Helper;
+using ExaminationSystem.ModelDTO.ExamQuestion;
 using ExaminationSystem.Models;
 using ExaminationSystem.Repo;
 using ExaminationSystem.Services;
@@ -20,15 +21,15 @@ namespace ExaminationSystem
             builder.Services.AddOpenApi();
 
             //dependency injection
-            builder.Services.AddScoped<GenericRepository<Course>>();
-            builder.Services.AddScoped<GenericRepository<Question>>();
-            builder.Services.AddScoped<GenericRepository<Choice>>();
-            builder.Services.AddScoped<GenericRepository<Exam>>();
-            builder.Services.AddScoped<GenericRepository<ExamQuestion>>();
-            builder.Services.AddScoped<GenericRepository<Instructor>>();
+            builder.Services.AddScoped(typeof(GenericRepository<>));
             builder.Services.AddScoped<Context>();
             builder.Services.AddScoped<QuestionService>();
             builder.Services.AddScoped<ChoiceService>();
+            builder.Services.AddScoped<CourseService>();
+            builder.Services.AddScoped<InstructorService>();
+            builder.Services.AddScoped<ExamQuestionService>();
+            builder.Services.AddScoped<ExamStudentService>();
+            builder.Services.AddScoped<ExamService>();
 
             builder.Services.AddAutoMapper(typeof(Program).Assembly);
             var app = builder.Build();
