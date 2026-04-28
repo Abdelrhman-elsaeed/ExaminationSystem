@@ -10,6 +10,7 @@ using ExaminationSystem.ViewModels;
 using ExaminationSystem.ViewModels.Choice;
 using ExaminationSystem.ViewModels.Question;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection.Metadata.Ecma335;
 
@@ -20,83 +21,79 @@ namespace ExaminationSystem.Controllers
     [Route("[controller]/[action]")]
     public class QuestionController : ControllerBase
     {
-        //private readonly QuestionService _QuestionService;
-        //public QuestionController(QuestionService QuestionService)
-        //{
-        //    _QuestionService = QuestionService;
-        //}
+        private readonly QuestionService _QuestionService;
+        public QuestionController(QuestionService QuestionService)
+        {
+            _QuestionService = QuestionService;
+        }
 
-        //[HttpPut]
-        //public async Task<ResponseViewModel<CreateQuestionVM>> Add(CreateQuestionVM model)
-        //{
-        //    // map VM to DTO
-        //    var newQuestionDto = model.Map<CreateQuestionDTO>();
-        //    var result = await _QuestionService.AddAsync(newQuestionDto);
+        [HttpPut]
+        public async Task<ActionResult> Add(CreateQuestionVM model)
+        {
+            var newQuestionDto = model.Map<CreateQuestionDTO>();
+            var result = await _QuestionService.AddAsync(newQuestionDto);
 
-        //    if (result)
-        //        return ResponseViewModel<CreateQuestionVM>.Success(model,message: "Question added successfully.");
-        //    else
-        //        return ResponseViewModel<CreateQuestionVM>.Failure(ErrorCode.None,"Question was not added successfully.");
-        //}
+            if (result.Data)
+                return Ok(result);
+            else
+                return NotFound(result);
+        }
 
-        //[HttpDelete]
-        //public async Task<ResponseViewModel<bool>> Delete(int id)
-        //{
-        //    var result = await _QuestionService.DeleteQuestionAndChoicesAsync(id);
+        [HttpDelete]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var result = await _QuestionService.DeleteQuestionAndChoicesAsync(id);
 
-        //    if (result)
-        //        return ResponseViewModel<bool>.Success(result, message: "Question and Choices Deleted Successfully");
-        //    else
-        //        return ResponseViewModel<bool>.Failure(ErrorCode.QustionNotFound,"Unable to delete Question and Choices");
+            if (result.Data)
+                return Ok(result);
+            else
+                return NotFound(result);
 
-        //}
+        }
 
-        //[HttpGet]
-        //public async Task<ResponseViewModel<List<GetAllQuestionVM>>> GetAll()
-        //{
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
 
-        //    // here T = List<GetAllQuestionVM>
+            var ResultDTO = await _QuestionService.GetAllAsync();
 
-        //    var allQuestionDTOs = await _QuestionService.GetAllAsync();
+            if (!ResultDTO.IsSuccess)
+            {
+                return NotFound(ResultDTO);
+            }
 
-        //    if (allQuestionDTOs is null || !allQuestionDTOs.Any())
-        //    {
-        //        return ResponseViewModel<List<GetAllQuestionVM>>.Failure(ErrorCode.QustionNotFound, message: "Questions Not Found");
-        //    }
+            var ResultVM = ResultDTO.Data.Select(q => q.Map<GetAllQuestionVM>()).ToList();
 
-        //    var allQuestionVM = allQuestionDTOs.Select(q => q.Map<GetAllQuestionVM>()).ToList();
+            return Ok(ResponseViewModel<List<GetAllQuestionVM>>.Success(ResultVM, message: ResultDTO.Message));
 
-        //    return ResponseViewModel<List<GetAllQuestionVM>>.Success(allQuestionVM, message: "All Questions Returived Successfully");
+        }
 
+        [HttpPatch]
+        public async Task<IActionResult> UpdateQuestion(UpdateQuestionVM model)
+        {
 
-        //}
+            var UpdatesDTO = model.Map<UpdateQuestionDTO>();
 
-        //[HttpPatch]
-        //public async Task<ResponseViewModel<bool>> UpdateQuestion(UpdateQuestionVM model)
-        //{
+            var result = await _QuestionService.UpdateQuestionAsync(UpdatesDTO);
 
-        //    var UpdatesDTO = model.Map<UpdateQuestionDTO>();
+            if (result.IsSuccess)
+                return Ok(result);
+            else
+                return NotFound(result);
+        }
 
-        //    var result = await _QuestionService.UpdateQuestionAsync(UpdatesDTO);
+        [HttpPatch]
+        public async Task<IActionResult> UpdateChoice(UpdateChoiceVM model)
+        {
+            var UpdateDTO = model.Map<UpdateChoiceDTO>();
 
-        //    if (result)
-        //        return ResponseViewModel<bool>.Success(result, message: "Questoin Updated Successfully");
-        //    else
-        //        return ResponseViewModel<bool>.Failure(ErrorCode.QuestionUpdateFail, message: "Questoin Fail to Update Successfully");
-        //}
+            var result = await _QuestionService.UpdateChoiceAsync(UpdateDTO);
 
-        //[HttpPatch]
-        //public async Task<ResponseViewModel<bool>> UpdateChoice (UpdateChoiceVM model)
-        //{
-        //    var UpdateDTO = model.Map<UpdateChoiceDTO>();
-
-        //    var result = await _QuestionService.UpdateChoiceAsync(UpdateDTO);
-
-        //    if (result)
-        //        return ResponseViewModel<bool>.Success(result, message: "Choice Updated Successfully");
-        //    else
-        //        return ResponseViewModel<bool>.Failure(ErrorCode.ChoiceUpdateFail, message: "Choice fail to update");
-        //}
+            if (result.IsSuccess)
+                return Ok(result);
+            else
+                return NotFound(result);
+        }
 
     }
 }
