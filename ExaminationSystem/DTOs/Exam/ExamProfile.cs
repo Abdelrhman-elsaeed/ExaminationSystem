@@ -14,6 +14,14 @@ namespace ExaminationSystem.DTOs.Exam
             CreateMap<CreateExamDTO, ExaminationSystem.Models.Exam>().ReverseMap();
             CreateMap<UpdateExamDTO, UpdateExamVM>().ReverseMap();
             CreateMap<UpdateExamDTO, ExaminationSystem.Models.Exam>().ReverseMap();
+            CreateMap<ExamViewDTO, ExamViewVM>().ReverseMap();
+            CreateMap<ExamViewDTO, ExaminationSystem.Models.Exam>().ReverseMap();
+
+            CreateMap<CreateRandomExamDTO, CreateRandomExamVM>().ReverseMap();
+            CreateMap<CreateRandomExamDTO, ExaminationSystem.Models.Exam>().ReverseMap();
+
+
+
         }
     }
 }

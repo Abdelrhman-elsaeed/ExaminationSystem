@@ -7,7 +7,6 @@ namespace ExaminationSystem.DTOs.ExamStudent
 
         public int StudentId { get; set; }
         public int ExamId { get; set; }
-        public decimal? FinalGrade { get; set; }
 
     }
 }

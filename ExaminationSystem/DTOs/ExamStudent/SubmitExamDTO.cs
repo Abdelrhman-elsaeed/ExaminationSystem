@@ -2,7 +2,7 @@
 using ExaminationSystem.Models;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ExaminationSystem.DTOs.Exam
+namespace ExaminationSystem.DTOs.ExamStudent
 {
     public class SubmitExamDTO
     {
