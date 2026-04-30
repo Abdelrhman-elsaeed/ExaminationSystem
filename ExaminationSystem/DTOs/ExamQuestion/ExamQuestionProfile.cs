@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ExaminationSystem.DTOs.Question;
 using ExaminationSystem.ModelDTO.Exam;
 using ExaminationSystem.ModelDTO.ExamQuestion;
 using ExaminationSystem.Models;
@@ -15,6 +16,7 @@ namespace ExaminationSystem.DTOs.ExamQuestion
             CreateMap<AssignQuestionToExamDTO,ExaminationSystem.Models.ExamQuestion>().ReverseMap();
             CreateMap<UpdateExamQuestionVM,UpdateExamQuestionDTO>().ReverseMap();
             CreateMap<UpdateExamQuestionDTO,ExaminationSystem.Models.ExamQuestion>().ReverseMap();
+            CreateMap<GetQuestionDTO, ExaminationSystem.Models.ExamQuestion>().ReverseMap();
         }
     }
 }

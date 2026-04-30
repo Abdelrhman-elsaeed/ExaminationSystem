@@ -326,5 +326,35 @@ namespace ExaminationSystem.Services
                 return ResponseViewModel<bool>.Failure(ErrorCode.AssignQuestionToExamFail, "Unexpected error occurred while assigning questions");
             }
         }
+
+        public async Task<ResponseViewModel<IEnumerable<ViewStudentsGradesDTO>>> ViewStudentsGrades(int ExamId)
+        {
+            var IsExamExist = await this.IsExist(ExamId);
+
+            if (IsExamExist)
+                return await _ExamStudentService.ViewStudentsGrades(ExamId);
+            else
+                return ResponseViewModel<IEnumerable<ViewStudentsGradesDTO>>.Failure(ErrorCode.ExamNotFound, "Exam Not Found");
+        }
+
+        public async Task<ResponseViewModel<decimal?>> TopGrade(int ExamId)
+        {
+            var IsExamExist = await this.IsExist(ExamId);
+
+            if (IsExamExist)
+                return await _ExamStudentService.TopGrade(ExamId);
+            else
+                return ResponseViewModel<decimal?>.Failure(ErrorCode.ExamNotFound, "Exam Not Found");
+        }
+
+        public async Task<ResponseViewModel<decimal?>> AverageGrade(int ExamId)
+        {
+            var IsExamExist = await this.IsExist(ExamId);
+
+            if (IsExamExist)
+                return await _ExamStudentService.AverageGrade(ExamId);
+            else
+                return ResponseViewModel<decimal?>.Failure(ErrorCode.ExamNotFound, "Exam Not Found");
+        }
     }
 }

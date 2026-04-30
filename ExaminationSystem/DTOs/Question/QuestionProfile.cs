@@ -16,6 +16,7 @@ namespace ExaminationSystem.DTOs.Question
             CreateMap<CreateQuestionDTO, ExaminationSystem.Models.Question>().ReverseMap();
 
             CreateMap<GetQuestionDTO, ExaminationSystem.Models.Question>().ReverseMap();
+            CreateMap<GetQuestionDTO, GetQuestionVM>().ReverseMap();
 
             CreateMap<UpdateQuestionDTO, ExaminationSystem.Models.Question>().ReverseMap();
 
