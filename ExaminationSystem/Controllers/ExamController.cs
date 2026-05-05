@@ -2,7 +2,7 @@
 using ExaminationSystem.DTOs.ExamQuestion;
 using ExaminationSystem.DTOs.ExamStudent;
 using ExaminationSystem.DTOs.Question;
-using ExaminationSystem.Helper;
+using ExaminationSystem.Helper.AutoMapper;
 using ExaminationSystem.ModelDTO.Exam;
 using ExaminationSystem.ModelDTO.ExamQuestion;
 using ExaminationSystem.Models;

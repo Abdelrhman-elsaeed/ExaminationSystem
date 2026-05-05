@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 
-namespace ExaminationSystem.Helper
+namespace ExaminationSystem.Helper.AutoMapper
 {
     public static class AutoMapperHelper
     {

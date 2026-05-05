@@ -1,6 +1,6 @@
 ﻿using ExaminationSystem.DTOs.ExamStudent;
 using ExaminationSystem.Enums;
-using ExaminationSystem.Helper;
+using ExaminationSystem.Helper.AutoMapper;
 using ExaminationSystem.Models;
 using ExaminationSystem.Repo;
 using ExaminationSystem.ViewModels;

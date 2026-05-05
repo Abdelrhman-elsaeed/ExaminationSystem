@@ -1,6 +1,6 @@
 ﻿using ExaminationSystem.DTOs.ExamQuestion;
 using ExaminationSystem.DTOs.Question;
-using ExaminationSystem.Helper;
+using ExaminationSystem.Helper.AutoMapper;
 using ExaminationSystem.ModelDTO.Choice;
 using ExaminationSystem.ModelDTO.ExamQuestion;
 using ExaminationSystem.Models;

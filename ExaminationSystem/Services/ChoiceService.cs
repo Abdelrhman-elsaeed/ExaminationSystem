@@ -1,4 +1,4 @@
-﻿using ExaminationSystem.Helper;
+﻿using ExaminationSystem.Helper.AutoMapper;
 using ExaminationSystem.ModelDTO.Choice;
 using ExaminationSystem.Models;
 using ExaminationSystem.Repo;
