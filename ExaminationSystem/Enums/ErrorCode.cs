@@ -29,6 +29,10 @@
         AssignStudentToExamFail = 312,
         StudentNotAssignedToExam = 313,
         NoQuestionsAssignedToExam = 314,
-        SubmitExamFail = 315
+        SubmitExamFail = 315,
+
+
+        InvalidCredentials=400,
+        UserNotFound=401
     }
 }

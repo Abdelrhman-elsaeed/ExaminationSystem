@@ -1,9 +1,15 @@
-﻿using ExaminationSystem.DTOs.Auth;
+﻿using Azure;
+using ExaminationSystem.DTOs.Auth;
 using ExaminationSystem.Helper.JWT;
+using ExaminationSystem.Services;
+using ExaminationSystem.ViewModels;
+using ExaminationSystem.ViewModels.Auth;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExaminationSystem.Controllers
 {
+    [ApiController]
+    [Route("[controller]/[action]")]
     public class AuthController : ControllerBase
     {
         private readonly UserService _userService;
@@ -16,24 +22,22 @@ namespace ExaminationSystem.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
+        public async Task<ActionResult> Login([FromBody] LoginRequestVM request)
         {
-            var user = await _userService.LoginAsync(request.Username, request.Password);
+            var loginDto = new LoginRequestDto(request.Username, request.Password);
 
-            if (user is null)
-                return Unauthorized(new { Message = "Invalid credentials." });
+            var result = await _userService.LoginAsync(loginDto);
 
+            if (!result.IsSuccess)
+                return Unauthorized(result);
+
+            //Generate Token
             var token = _tokenGenerator.Generate(
-                userId: user.Id,
-                name: user.Name,
-                role: user.Role.ToString()
-            );
+                userId: result.Data!.Id,
+                name: result.Data.Name,
+                role: result.Data.Role);
 
-            return Ok(new LoginResponseDto(
-                Token: token,
-                Name: user.Name,
-                Role: user.Role.ToString()
-            ));
+            return Ok(ResponseViewModel<LoginResponseVM>.Success (new LoginResponseVM(token, result.Data.Name, result.Data.Role)));
         }
 
     }

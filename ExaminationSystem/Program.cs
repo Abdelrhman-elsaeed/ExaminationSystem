@@ -1,6 +1,6 @@
 using AutoMapper;
 using ExaminationSystem.DataBase;
-using ExaminationSystem.Helper;
+using ExaminationSystem.Helper.AutoMapper;
 using ExaminationSystem.Helper.JWT;
 using ExaminationSystem.ModelDTO.ExamQuestion;
 using ExaminationSystem.Models;
@@ -76,6 +76,8 @@ namespace ExaminationSystem
             builder.Services.AddScoped<ExamQuestionService>();
             builder.Services.AddScoped<ExamStudentService>();
             builder.Services.AddScoped<ExamService>();
+            builder.Services.AddScoped<TokenGenerator>();
+            builder.Services.AddScoped<UserService>();
 
             builder.Services.AddAutoMapper(typeof(Program).Assembly);
             var app = builder.Build();

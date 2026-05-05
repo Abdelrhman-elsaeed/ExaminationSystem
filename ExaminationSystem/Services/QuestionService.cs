@@ -2,7 +2,7 @@
 using ExaminationSystem.DTOs.Question;
 using ExaminationSystem.Enums;
 using ExaminationSystem.Enums.Question;
-using ExaminationSystem.Helper;
+using ExaminationSystem.Helper.AutoMapper;
 using ExaminationSystem.ModelDTO.Choice;
 using ExaminationSystem.ModelDTO.Question;
 using ExaminationSystem.Models;

@@ -1,5 +1,5 @@
 ﻿using ExaminationSystem.Enums;
-using ExaminationSystem.Helper;
+using ExaminationSystem.Helper.AutoMapper;
 using ExaminationSystem.ModelDTO.Choice;
 using ExaminationSystem.ModelDTO.Question;
 using ExaminationSystem.Models;

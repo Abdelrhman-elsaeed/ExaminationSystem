@@ -4,7 +4,7 @@ using ExaminationSystem.DTOs.ExamStudent;
 using ExaminationSystem.DTOs.Question;
 using ExaminationSystem.Enums;
 using ExaminationSystem.Enums.Exam;
-using ExaminationSystem.Helper;
+using ExaminationSystem.Helper.AutoMapper;
 using ExaminationSystem.ModelDTO.Exam;
 using ExaminationSystem.ModelDTO.ExamQuestion;
 using ExaminationSystem.Models;
