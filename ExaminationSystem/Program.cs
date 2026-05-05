@@ -1,10 +1,14 @@
 using AutoMapper;
 using ExaminationSystem.DataBase;
 using ExaminationSystem.Helper;
+using ExaminationSystem.Helper.JWT;
 using ExaminationSystem.ModelDTO.ExamQuestion;
 using ExaminationSystem.Models;
 using ExaminationSystem.Repo;
 using ExaminationSystem.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace ExaminationSystem
 {
@@ -14,8 +18,50 @@ namespace ExaminationSystem
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            //=================================================================
+            //                              jwt  
+            //=================================================================
 
+            // 1.jwt Settings (Option Pattern)
+            builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+            var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>()!;
+
+            // 2.Secret Key 
+            var keyBytes = Encoding.ASCII.GetBytes(jwtSettings.SecretKey);
+
+            // 3.Authentication Configuration
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
+
+                    ValidateIssuer = true,
+                    ValidIssuer = jwtSettings.Issuer,
+
+                    ValidateAudience = true,
+
+                    ValidAudience = jwtSettings.Audience,
+                    ValidateLifetime = true,
+
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
+
+            // 4.Authorization Configuration
+            builder.Services.AddAuthorization();
+
+            //=================================================================
+            //=================================================================
+
+
+            // Add services to the container.
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
@@ -33,6 +79,9 @@ namespace ExaminationSystem
 
             builder.Services.AddAutoMapper(typeof(Program).Assembly);
             var app = builder.Build();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             //AutoMapper Configuration
             AutoMapperHelper.Mapper = app.Services.GetRequiredService<IMapper>();
