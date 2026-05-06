@@ -33,6 +33,16 @@
 
 
         InvalidCredentials=400,
-        UserNotFound=401
+        UserNotFound=401,
+        AssignFeatureToRoleFail=402,
+        InvalidRole=403,
+        InvalidFeature=404,
+        FeatureAlreadyAssignedToRole=405,
+
+
+
+        AddUserFail=500,
+        UpdateUserFail=501,
+        DeleteUserFail=502
     }
 }
