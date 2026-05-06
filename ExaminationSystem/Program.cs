@@ -77,7 +77,10 @@ namespace ExaminationSystem
             builder.Services.AddScoped<ExamStudentService>();
             builder.Services.AddScoped<ExamService>();
             builder.Services.AddScoped<TokenGenerator>();
+            builder.Services.AddScoped<RoleFeature>();
             builder.Services.AddScoped<UserService>();
+            builder.Services.AddScoped<User>();
+
 
             builder.Services.AddAutoMapper(typeof(Program).Assembly);
             var app = builder.Build();

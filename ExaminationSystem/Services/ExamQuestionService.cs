@@ -17,7 +17,6 @@ namespace ExaminationSystem.Services
         {
             _ExamQuestionRepo = ExamQuestionRepo;
         }
-
         public async Task<bool> IsQuestionExistOnExam(int ExamId,int QuestionId)
         {
             return await _ExamQuestionRepo.AnyAsync(eq => eq.ExamId == ExamId && eq.QuestionId == QuestionId && eq.Deleted == false);
@@ -94,7 +93,6 @@ namespace ExaminationSystem.Services
 
                 }).ToListAsync();
         }
-
         public async Task<bool> UpdateQuestionOnExam(UpdateExamQuestionDTO model)
         {
             //1-validate ExamQuestion Record Exist

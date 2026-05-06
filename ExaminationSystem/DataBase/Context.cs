@@ -40,5 +40,7 @@ namespace ExaminationSystem.DataBase
         public DbSet<Question> Questions { get; set; }
         public DbSet<Student> Students { get; set; }
         public DbSet<StudentAnswer> StudentAnswers { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<RoleFeature> RoleFeatures { get; set; }
     }
 }

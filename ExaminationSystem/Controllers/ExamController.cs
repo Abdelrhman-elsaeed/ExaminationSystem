@@ -205,7 +205,5 @@ namespace ExaminationSystem.Controllers
 
         }
 
-        //Assign Student to Exam
-
     }
 }
