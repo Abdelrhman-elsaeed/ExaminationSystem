@@ -1,5 +1,6 @@
 ﻿using ExaminationSystem.Enums;
 using ExaminationSystem.Helper.AutoMapper;
+using ExaminationSystem.Helper.Filters;
 using ExaminationSystem.ModelDTO.Choice;
 using ExaminationSystem.ModelDTO.Question;
 using ExaminationSystem.Models;
@@ -9,6 +10,7 @@ using ExaminationSystem.Services;
 using ExaminationSystem.ViewModels;
 using ExaminationSystem.ViewModels.Choice;
 using ExaminationSystem.ViewModels.Question;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +21,7 @@ namespace ExaminationSystem.Controllers
 
     [ApiController]
     [Route("[controller]/[action]")]
+    [Authorize]
     public class QuestionController : ControllerBase
     {
         private readonly QuestionService _QuestionService;
@@ -28,6 +31,7 @@ namespace ExaminationSystem.Controllers
         }
 
         [HttpPut]
+        [TypeFilter(typeof(CustomAuthorizeFilter),Arguments = new object[] { Feature.AddQuestion })]
         public async Task<ActionResult> Add(CreateQuestionVM model)
         {
             var newQuestionDto = model.Map<CreateQuestionDTO>();
@@ -40,6 +44,7 @@ namespace ExaminationSystem.Controllers
         }
 
         [HttpDelete]
+        [TypeFilter(typeof(CustomAuthorizeFilter), Arguments = new object[] { Feature.DeleteQuestion })]
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _QuestionService.DeleteQuestionAndChoicesAsync(id);
@@ -52,6 +57,7 @@ namespace ExaminationSystem.Controllers
         }
 
         [HttpGet]
+        [TypeFilter(typeof(CustomAuthorizeFilter), Arguments = new object[] { Feature.GetAllQuestions })]
         public async Task<IActionResult> GetAll()
         {
 
@@ -69,6 +75,7 @@ namespace ExaminationSystem.Controllers
         }
 
         [HttpPatch]
+        [TypeFilter(typeof(CustomAuthorizeFilter), Arguments = new object[] { Feature.UpdateQuestion })]
         public async Task<IActionResult> UpdateQuestion(UpdateQuestionVM model)
         {
 
@@ -83,6 +90,7 @@ namespace ExaminationSystem.Controllers
         }
 
         [HttpPatch]
+        [TypeFilter(typeof(CustomAuthorizeFilter), Arguments = new object[] { Feature.UpdateChoice })]
         public async Task<IActionResult> UpdateChoice(UpdateChoiceVM model)
         {
             var UpdateDTO = model.Map<UpdateChoiceDTO>();

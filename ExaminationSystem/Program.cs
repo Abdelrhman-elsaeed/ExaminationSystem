@@ -8,6 +8,7 @@ using ExaminationSystem.Repo;
 using ExaminationSystem.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 using System.Text;
 
 namespace ExaminationSystem
@@ -50,7 +51,8 @@ namespace ExaminationSystem
                     ValidAudience = jwtSettings.Audience,
                     ValidateLifetime = true,
 
-                    ClockSkew = TimeSpan.Zero
+                    ClockSkew = TimeSpan.Zero,
+
                 };
             });
 
@@ -78,6 +80,7 @@ namespace ExaminationSystem
             builder.Services.AddScoped<ExamService>();
             builder.Services.AddScoped<TokenGenerator>();
             builder.Services.AddScoped<RoleFeature>();
+            builder.Services.AddScoped<RoleFeatureService>();
             builder.Services.AddScoped<UserService>();
             builder.Services.AddScoped<User>();
 
@@ -85,8 +88,7 @@ namespace ExaminationSystem
             builder.Services.AddAutoMapper(typeof(Program).Assembly);
             var app = builder.Build();
 
-            app.UseAuthentication();
-            app.UseAuthorization();
+
 
             //AutoMapper Configuration
             AutoMapperHelper.Mapper = app.Services.GetRequiredService<IMapper>();
@@ -99,8 +101,8 @@ namespace ExaminationSystem
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
-
 
             app.MapControllers();
 

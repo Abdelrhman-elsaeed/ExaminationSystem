@@ -36,9 +36,11 @@ namespace ExaminationSystem.Services
                 return ResponseViewModel<bool>.Failure(ErrorCode.AssignFeatureToRoleFail, message: "Fail to assign feature");
         }
 
-        //public async Task<ResponseViewModel<bool>> HasAccess(Feature feature, Role role)
-        //{
+        public async Task<bool> HasAccessAsync(Feature feature, Role role)
+        {
+           
+             return await _RoleFeatureRepo.AnyAsync(rf =>rf.Role == role && rf.Feature == feature && !rf.Deleted);
 
-        //}
+        }
     }
 }
