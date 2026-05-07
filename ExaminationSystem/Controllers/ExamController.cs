@@ -2,7 +2,9 @@
 using ExaminationSystem.DTOs.ExamQuestion;
 using ExaminationSystem.DTOs.ExamStudent;
 using ExaminationSystem.DTOs.Question;
+using ExaminationSystem.Enums;
 using ExaminationSystem.Helper.AutoMapper;
+using ExaminationSystem.Helper.Filters;
 using ExaminationSystem.ModelDTO.Exam;
 using ExaminationSystem.ModelDTO.ExamQuestion;
 using ExaminationSystem.Models;
@@ -13,6 +15,7 @@ using ExaminationSystem.ViewModels.Exam;
 using ExaminationSystem.ViewModels.ExamQuestion;
 using ExaminationSystem.ViewModels.ExamStudent;
 using ExaminationSystem.ViewModels.Question;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using System.Reflection.Metadata;
@@ -22,6 +25,7 @@ namespace ExaminationSystem.Controllers
 
     [ApiController]
     [Route("[controller]/[action]")]
+    [Authorize]
     public class ExamController : ControllerBase
     {
         private readonly ExamService _ExamService;
@@ -32,6 +36,7 @@ namespace ExaminationSystem.Controllers
 
 
         [HttpPut]
+        [TypeFilter(typeof(CustomAuthorizeFilter), Arguments = new object[] { Feature.AddExam })]
         public async Task<IActionResult> Add(CreateExamVM model)
         {
             var CreateExamDTO = model.Map<CreateExamDTO>();
@@ -44,6 +49,8 @@ namespace ExaminationSystem.Controllers
                 return NotFound(resutl);
         }
 
+        [HttpPut]
+        [TypeFilter(typeof(CustomAuthorizeFilter), Arguments = new object[] { Feature.AssignStudentToExam })]
         public async Task<IActionResult> AssignStudentToExam(CreateExamStudentVM model)
         {
             var ExamStudentDTO = model.Map<CreateExamStudentDTO>();
@@ -56,6 +63,7 @@ namespace ExaminationSystem.Controllers
         }
 
         [HttpPut]
+        [TypeFilter(typeof(CustomAuthorizeFilter), Arguments = new object[] { Feature.AssignQuestionToExam })]
         public async Task<IActionResult> AssignQuestionToExam(AssignQuestionToExamVM model)
         {
             var AssignQuesionDTO = model.Map<AssignQuestionToExamDTO>();
@@ -70,6 +78,7 @@ namespace ExaminationSystem.Controllers
         }
 
         [HttpPatch]
+        [TypeFilter(typeof(CustomAuthorizeFilter), Arguments = new object[] { Feature.UpdateExam })]
         public async Task<IActionResult> Update(UpdateExamVM model)
         {
             var UpdateDTO = model.Map<UpdateExamDTO>();
@@ -83,6 +92,7 @@ namespace ExaminationSystem.Controllers
         }
 
         [HttpDelete]
+        [TypeFilter(typeof(CustomAuthorizeFilter), Arguments = new object[] { Feature.DeleteExam })]
         public async Task<IActionResult> DeleteExam(int id)
         {
             var resutl = await _ExamService.DeleteAsync(id);
@@ -94,6 +104,7 @@ namespace ExaminationSystem.Controllers
         }
 
         [HttpPatch]
+        [TypeFilter(typeof(CustomAuthorizeFilter), Arguments = new object[] { Feature.UpdateQuestionOnExam })]
         public async Task<IActionResult> UpdateQuestionOnExam(UpdateExamQuestionVM model)
         {
             var UpdateDTO = model.Map<UpdateExamQuestionDTO>();
@@ -107,6 +118,7 @@ namespace ExaminationSystem.Controllers
         }
 
         [HttpDelete]
+        [TypeFilter(typeof(CustomAuthorizeFilter), Arguments = new object[] { Feature.DeleteQuestionFromExam })]
         public async Task<IActionResult> DeleteQuestionFromExam(int id)
         {
             var result = await _ExamService.DeleteQuestoinFromExam(id);
@@ -118,6 +130,7 @@ namespace ExaminationSystem.Controllers
         }
 
         [HttpGet]
+        [TypeFilter(typeof(CustomAuthorizeFilter), Arguments = new object[] { Feature.ViewExam })]
         public async Task<IActionResult> ViewExam(int ExamId)
         {
             var ViewExamDTO = await _ExamService.ViewExam(ExamId);
@@ -138,6 +151,7 @@ namespace ExaminationSystem.Controllers
         }
 
         [HttpPut]
+        [TypeFilter(typeof(CustomAuthorizeFilter), Arguments = new object[] { Feature.SubmitExam })]
         public async Task<IActionResult> SubmitExam(SubmitExamVM model)
         {
             var SubmitExamDTO = model.Map<SubmitExamDTO>();
@@ -150,6 +164,7 @@ namespace ExaminationSystem.Controllers
         }
 
         [HttpPut]
+        [TypeFilter(typeof(CustomAuthorizeFilter), Arguments = new object[] { Feature.CreateRandomExam })]
         public async Task<IActionResult> CreateRandomExam(CreateRandomExamVM model)
         {
             var RandomExamDTO = model.Map<CreateRandomExamDTO>();
@@ -164,6 +179,7 @@ namespace ExaminationSystem.Controllers
         }
 
         [HttpGet]
+        [TypeFilter(typeof(CustomAuthorizeFilter), Arguments = new object[] { Feature.ViewStudentsGrades })]
         public async Task<IActionResult> ViewStudentsGrades(int ExamId)
         {
             var StudentsGradesDTO = await _ExamService.ViewStudentsGrades(ExamId);
@@ -180,6 +196,7 @@ namespace ExaminationSystem.Controllers
         }
 
         [HttpGet]
+        [TypeFilter(typeof(CustomAuthorizeFilter), Arguments = new object[] { Feature.TopGrade })]
         public async Task<IActionResult> TopGrade(int ExamId)
         {
             var StudentsTopGrades = await _ExamService.TopGrade(ExamId);
@@ -193,6 +210,7 @@ namespace ExaminationSystem.Controllers
         }
 
         [HttpGet]
+        [TypeFilter(typeof(CustomAuthorizeFilter), Arguments = new object[] { Feature.AverageGrade })]
         public async Task<IActionResult> AverageGrade(int ExamId)
         {
             var StudentAverageGrades = await _ExamService.AverageGrade(ExamId);

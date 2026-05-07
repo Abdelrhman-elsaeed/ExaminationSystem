@@ -38,6 +38,7 @@
         InvalidRole=403,
         InvalidFeature=404,
         FeatureAlreadyAssignedToRole=405,
+        AccessDenied= 406,
 
 
 
