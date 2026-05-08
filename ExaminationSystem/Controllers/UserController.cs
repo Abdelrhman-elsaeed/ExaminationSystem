@@ -1,13 +1,4 @@
-﻿using ExaminationSystem.DTOs.User;
-using ExaminationSystem.Helper.AutoMapper;
-using ExaminationSystem.Services;
-using ExaminationSystem.ViewModels;
-using ExaminationSystem.ViewModels.User;
-using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace ExaminationSystem.Controllers
+﻿namespace ExaminationSystem.Controllers
 {
     [ApiController]
     [Route("[controller]/[action]")]

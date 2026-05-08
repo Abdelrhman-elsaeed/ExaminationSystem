@@ -1,26 +1,4 @@
-﻿using ExaminationSystem.DTOs.Exam;
-using ExaminationSystem.DTOs.ExamQuestion;
-using ExaminationSystem.DTOs.ExamStudent;
-using ExaminationSystem.DTOs.Question;
-using ExaminationSystem.Enums;
-using ExaminationSystem.Helper.AutoMapper;
-using ExaminationSystem.Helper.Filters;
-using ExaminationSystem.ModelDTO.Exam;
-using ExaminationSystem.ModelDTO.ExamQuestion;
-using ExaminationSystem.Models;
-using ExaminationSystem.Repo;
-using ExaminationSystem.Services;
-using ExaminationSystem.ViewModels;
-using ExaminationSystem.ViewModels.Exam;
-using ExaminationSystem.ViewModels.ExamQuestion;
-using ExaminationSystem.ViewModels.ExamStudent;
-using ExaminationSystem.ViewModels.Question;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using System.Reflection.Metadata;
-
-namespace ExaminationSystem.Controllers
+﻿namespace ExaminationSystem.Controllers
 {
 
     [ApiController]

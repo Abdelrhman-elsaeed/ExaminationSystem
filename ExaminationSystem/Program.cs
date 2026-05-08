@@ -1,15 +1,4 @@
-using AutoMapper;
-using ExaminationSystem.DataBase;
-using ExaminationSystem.Helper.AutoMapper;
-using ExaminationSystem.Helper.JWT;
-using ExaminationSystem.ModelDTO.ExamQuestion;
-using ExaminationSystem.Models;
-using ExaminationSystem.Repo;
-using ExaminationSystem.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Security.Claims;
-using System.Text;
+using ExaminationSystem.BLL.AutoMapper.Profiles;
 
 namespace ExaminationSystem
 {
@@ -84,8 +73,12 @@ namespace ExaminationSystem
             builder.Services.AddScoped<UserService>();
             builder.Services.AddScoped<User>();
 
+            // We use a specific type 'AuthProfile' to get a reference to the BLL Assembly.
+            // This registers all AutoMapper profiles inside the BLL layer in a single scan.
+            // Architectural Trade-off: This approach avoids the performance overhead and 
+            // lazy-loading bugs caused by scanning all loaded assemblies using 'AppDomain.CurrentDomain.GetAssemblies()'.
+            builder.Services.AddAutoMapper(typeof(AuthProfile).Assembly);
 
-            builder.Services.AddAutoMapper(typeof(Program).Assembly);
             var app = builder.Build();
 
 

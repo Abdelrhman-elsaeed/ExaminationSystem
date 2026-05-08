@@ -1,22 +1,4 @@
-﻿using ExaminationSystem.Enums;
-using ExaminationSystem.Helper.AutoMapper;
-using ExaminationSystem.Helper.Filters;
-using ExaminationSystem.ModelDTO.Choice;
-using ExaminationSystem.ModelDTO.Question;
-using ExaminationSystem.Models;
-using ExaminationSystem.ModelVm.Question;
-using ExaminationSystem.Repo;
-using ExaminationSystem.Services;
-using ExaminationSystem.ViewModels;
-using ExaminationSystem.ViewModels.Choice;
-using ExaminationSystem.ViewModels.Question;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.EntityFrameworkCore;
-using System.Reflection.Metadata.Ecma335;
-
-namespace ExaminationSystem.Controllers
+﻿namespace ExaminationSystem.Controllers
 {
 
     [ApiController]

@@ -1,11 +1,4 @@
-﻿using ExaminationSystem.DataBase;
-using ExaminationSystem.Models;
-using ExaminationSystem.ModelVm.Course;
-using ExaminationSystem.Repo;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-
-namespace ExaminationSystem.Controllers
+﻿namespace ExaminationSystem.Controllers
 {
 
     [ApiController]

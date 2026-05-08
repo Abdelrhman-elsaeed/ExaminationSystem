@@ -1,0 +1,10 @@
+﻿global using ExaminationSystem.DAL.DataBase;
+global using ExaminationSystem.DAL.Models;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.EntityFrameworkCore.ChangeTracking;
+global using Microsoft.Extensions.Logging;
+global using System.Diagnostics;
+global using System.Linq.Expressions;
+global using System.ComponentModel.DataAnnotations.Schema;
+global using ExaminationSystem.DAL.Enums.Exam;
+global using ExaminationSystem.Enums.JWT_Role;
