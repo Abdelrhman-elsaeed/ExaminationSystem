@@ -1,12 +1,4 @@
-﻿using Azure;
-using ExaminationSystem.DTOs.Auth;
-using ExaminationSystem.Helper.JWT;
-using ExaminationSystem.Services;
-using ExaminationSystem.ViewModels;
-using ExaminationSystem.ViewModels.Auth;
-using Microsoft.AspNetCore.Mvc;
-
-namespace ExaminationSystem.Controllers
+﻿namespace ExaminationSystem.Controllers
 {
     [ApiController]
     [Route("[controller]/[action]")]

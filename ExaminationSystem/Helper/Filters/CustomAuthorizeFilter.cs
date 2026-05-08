@@ -1,7 +1,8 @@
-﻿using ExaminationSystem.Enums;
+﻿using ExaminationSystem.BLL.Services;
+using ExaminationSystem.BLL.ViewModels;
+using ExaminationSystem.DAL.Enums;
+using ExaminationSystem.Enums;
 using ExaminationSystem.Enums.JWT_Role;
-using ExaminationSystem.Services;
-using ExaminationSystem.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Security.Claims;
