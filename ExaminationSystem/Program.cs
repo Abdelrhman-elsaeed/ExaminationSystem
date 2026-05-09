@@ -1,4 +1,5 @@
 using ExaminationSystem.BLL.AutoMapper.Profiles;
+using ExaminationSystem.Middlewares;
 
 namespace ExaminationSystem
 {
@@ -79,8 +80,13 @@ namespace ExaminationSystem
             // lazy-loading bugs caused by scanning all loaded assemblies using 'AppDomain.CurrentDomain.GetAssemblies()'.
             builder.Services.AddAutoMapper(typeof(AuthProfile).Assembly);
 
+            // Error Handler
+            builder.Services.AddScoped<GlobalErrorHandlerMiddleware>();
+
             var app = builder.Build();
 
+            // Error Handler Middleware
+            app.UseMiddleware<GlobalErrorHandlerMiddleware>();
 
 
             //AutoMapper Configuration
