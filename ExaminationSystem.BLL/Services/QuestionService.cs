@@ -1,4 +1,7 @@
 ﻿
+
+using ExaminationSystem.BLL.Helper.BusinessExceptions;
+
 namespace ExaminationSystem.BLL.Services
 {
     public class QuestionService
@@ -54,32 +57,22 @@ namespace ExaminationSystem.BLL.Services
 
         public async Task<ResponseViewModel<bool>> DeleteQuestionAndChoicesAsync(int id)
         {
-            // TransactionScope keeps DB logic out of the service layer
-            using var DeleteTransaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-
-            try
+            // Delete Question
+            var QuestionResult = await _QuestionRepo.DeleteAsync(id);
+            if (!QuestionResult)
             {
-                // Delete Question
-                var QuestionResult = await _QuestionRepo.DeleteAsync(id);
-                if (!QuestionResult)
-                    return ResponseViewModel<bool>.Failure(ErrorCode.QuestionDeleteFail, message: "Failed to delete the question");
-
-                //Delete Question Choices
-                var ChoicesResult = await _ChoiceService.DeleteByQuestionIdAsync(id);
-                if (!ChoicesResult)
-                    return ResponseViewModel<bool>.Failure(ErrorCode.ChoiceDeleteFail, message: "Failed to delete the choices");
-
-                //commit Transaction
-                DeleteTransaction.Complete();
-                return ResponseViewModel<bool>.Success(true, message: "Question and choices Deleted Successfully");
-
+                // Throw an exception so the transaction rolls back and the global error handler takes over
+                throw new BusinessException(ErrorCode.QuestionDeleteFail, "Faild to delete Question");
             }
-            catch
+
+            // Delete Question Choices
+            var ChoicesResult = await _ChoiceService.DeleteByQuestionIdAsync(id);
+            if (!ChoicesResult)
             {
-                // Automatically rolls back if Complete() is not called
-                return ResponseViewModel<bool>.Failure(ErrorCode.QuestoinChoicesTransactionFail, message: "Unexpected error while deleting question and choices");
-
+                throw new BusinessException(ErrorCode.ChoiceDeleteFail, "Faild to delete Chocices");
             }
+
+            return ResponseViewModel<bool>.Success(true, message: "Question and choices Deleted Successfully");
         }
 
         public async Task<ResponseViewModel<bool>> UpdateQuestionAsync(UpdateQuestionDTO model)

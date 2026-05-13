@@ -30,11 +30,7 @@
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _QuestionService.DeleteQuestionAndChoicesAsync(id);
-
-            if (result.Data)
-                return Ok(result);
-            else
-                return NotFound(result);
+            return Ok(result);
 
         }
 

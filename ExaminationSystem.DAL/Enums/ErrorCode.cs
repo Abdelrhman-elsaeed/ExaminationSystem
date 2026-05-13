@@ -3,6 +3,7 @@
     public enum ErrorCode
     {
         None = 0,
+        UnexpectedError=1,
 
         QustionNotFound = 100,
         QuestionUpdateFail = 101,
