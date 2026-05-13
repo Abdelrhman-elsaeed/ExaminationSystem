@@ -82,12 +82,14 @@ namespace ExaminationSystem
 
             // Error Handler
             builder.Services.AddScoped<GlobalErrorHandlerMiddleware>();
+            builder.Services.AddScoped<TransactionMiddleware>();
 
             var app = builder.Build();
 
             // Error Handler Middleware
             app.UseMiddleware<GlobalErrorHandlerMiddleware>();
-
+            // Transaction Middleware
+            app.UseMiddleware<TransactionMiddleware>();
 
             //AutoMapper Configuration
             AutoMapperHelper.Mapper = app.Services.GetRequiredService<IMapper>();
