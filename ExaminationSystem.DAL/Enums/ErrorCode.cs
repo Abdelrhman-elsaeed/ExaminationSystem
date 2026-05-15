@@ -45,6 +45,10 @@
 
         AddUserFail = 500,
         UpdateUserFail = 501,
-        DeleteUserFail = 502
+        DeleteUserFail = 502,
+
+        AddCourseFail=600,
+        UpdateCourseFail=601,
+        DeleteCourseFail=602
     }
 }
