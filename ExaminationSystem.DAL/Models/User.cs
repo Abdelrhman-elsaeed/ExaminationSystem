@@ -1,12 +1,17 @@
 ﻿
+using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
+
 namespace ExaminationSystem.DAL.Models
 {
-    public class User : BaseModel
+    public class User : IdentityUser
     {
-        public string Name { get; set; } = string.Empty;
-        public string Username { get; set; } = string.Empty;
-        public string PasswordHash { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public Role Role { get; set; }
+        [Required]
+        [MaxLength(50)]
+        public string FirstName { get; set; }
+
+        [Required]
+        [MaxLength(50)]
+        public string LastName { get; set; }
     }
 }

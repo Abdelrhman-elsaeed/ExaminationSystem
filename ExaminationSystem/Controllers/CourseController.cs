@@ -7,6 +7,7 @@ namespace ExaminationSystem.Controllers
 
     [ApiController]
     [Route("[controller]/[action]")]
+    [Authorize]
     public class CourseController : ControllerBase
     {
 

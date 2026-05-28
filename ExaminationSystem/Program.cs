@@ -1,5 +1,9 @@
 using ExaminationSystem.BLL.AutoMapper.Profiles;
+using ExaminationSystem.BLL.Helper.JWT;
+using ExaminationSystem.BLL.Services.Interfaces;
 using ExaminationSystem.Middlewares;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace ExaminationSystem
 {
@@ -9,54 +13,41 @@ namespace ExaminationSystem
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            //=================================================================
-            //                              jwt  
-            //=================================================================
-
-            // 1.jwt Settings (Option Pattern)
-            builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
-            var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>()!;
-
-            // 2.Secret Key 
-            var keyBytes = Encoding.ASCII.GetBytes(jwtSettings.SecretKey);
-
-            // 3.Authentication Configuration
-            builder.Services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
-
-                    ValidateIssuer = true,
-                    ValidIssuer = jwtSettings.Issuer,
-
-                    ValidateAudience = true,
-
-                    ValidAudience = jwtSettings.Audience,
-                    ValidateLifetime = true,
-
-                    ClockSkew = TimeSpan.Zero,
-
-                };
-            });
-
-            // 4.Authorization Configuration
-            builder.Services.AddAuthorization();
-
-            //=================================================================
-            //=================================================================
-
-
             // Add services to the container.
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
+
+            // **JWT Configuration**
+            builder.Services.Configure<JWT>(builder.Configuration.GetSection("JWT"));
+            builder.Services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<Context>();
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.SaveToken = false;
+                options.RequireHttpsMetadata = false;
+
+                // Token Validation
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidIssuer = builder.Configuration["JWT:Issuer"],
+                    ValidAudience = builder.Configuration["JWT:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]))
+                };
+            });
+
+            // Register Context
+            builder.Services.AddDbContext<Context>(options =>
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 
             //dependency injection
             builder.Services.AddScoped(typeof(GenericRepository<>));
@@ -68,11 +59,9 @@ namespace ExaminationSystem
             builder.Services.AddScoped<ExamQuestionService>();
             builder.Services.AddScoped<ExamStudentService>();
             builder.Services.AddScoped<ExamService>();
-            builder.Services.AddScoped<TokenGenerator>();
-            builder.Services.AddScoped<RoleFeature>();
-            builder.Services.AddScoped<RoleFeatureService>();
-            builder.Services.AddScoped<UserService>();
+            //builder.Services.AddScoped<UserService>();
             builder.Services.AddScoped<User>();
+            builder.Services.AddScoped<IAuthService, AuthService>();
 
             // We use a specific type 'AuthProfile' to get a reference to the BLL Assembly.
             // This registers all AutoMapper profiles inside the BLL layer in a single scan.
@@ -83,6 +72,7 @@ namespace ExaminationSystem
             // Error Handler
             builder.Services.AddScoped<GlobalErrorHandlerMiddleware>();
             builder.Services.AddScoped<TransactionMiddleware>();
+
 
             var app = builder.Build();
 

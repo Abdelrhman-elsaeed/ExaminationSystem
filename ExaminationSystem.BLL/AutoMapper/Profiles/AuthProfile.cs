@@ -5,7 +5,15 @@ namespace ExaminationSystem.BLL.AutoMapper.Profiles
     {
         public AuthProfile()
         {
-            CreateMap<LoginRequestDto, LoginRequestVM>().ReverseMap();
+            CreateMap<TokenRequestDto, TokenRequestVM>().ReverseMap();
+            CreateMap<AddRoleDto, AddRoleVM>().ReverseMap();
+
+
+            CreateMap<RegisterDto, User>().ReverseMap();
+            CreateMap<RegisterDto, RegisterVM>().ReverseMap();
+
+
+            CreateMap<AuthDto, AuthVM>().ReverseMap();
 
         }
     }

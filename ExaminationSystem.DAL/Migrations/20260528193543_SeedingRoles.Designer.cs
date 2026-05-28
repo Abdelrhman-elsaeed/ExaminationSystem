@@ -9,23 +9,23 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace ExaminationSystem.Migrations
+namespace ExaminationSystem.DAL.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20260506150508_UserJWT")]
-    partial class UserJWT
+    [Migration("20260528193543_SeedingRoles")]
+    partial class SeedingRoles
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.0")
+                .HasAnnotation("ProductVersion", "10.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("ExaminationSystem.Models.Choice", b =>
+            modelBuilder.Entity("ExaminationSystem.DAL.Models.Choice", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -59,7 +59,7 @@ namespace ExaminationSystem.Migrations
                     b.ToTable("Choices");
                 });
 
-            modelBuilder.Entity("ExaminationSystem.Models.Course", b =>
+            modelBuilder.Entity("ExaminationSystem.DAL.Models.Course", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -92,7 +92,7 @@ namespace ExaminationSystem.Migrations
                     b.ToTable("Courses");
                 });
 
-            modelBuilder.Entity("ExaminationSystem.Models.Exam", b =>
+            modelBuilder.Entity("ExaminationSystem.DAL.Models.Exam", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -137,7 +137,7 @@ namespace ExaminationSystem.Migrations
                     b.ToTable("Exams");
                 });
 
-            modelBuilder.Entity("ExaminationSystem.Models.ExamQuestion", b =>
+            modelBuilder.Entity("ExaminationSystem.DAL.Models.ExamQuestion", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -172,7 +172,7 @@ namespace ExaminationSystem.Migrations
                     b.ToTable("ExamQuestions");
                 });
 
-            modelBuilder.Entity("ExaminationSystem.Models.ExamStudent", b =>
+            modelBuilder.Entity("ExaminationSystem.DAL.Models.ExamStudent", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -207,7 +207,7 @@ namespace ExaminationSystem.Migrations
                     b.ToTable("ExamStudents");
                 });
 
-            modelBuilder.Entity("ExaminationSystem.Models.Instructor", b =>
+            modelBuilder.Entity("ExaminationSystem.DAL.Models.Instructor", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -233,7 +233,7 @@ namespace ExaminationSystem.Migrations
                     b.ToTable("Instructors");
                 });
 
-            modelBuilder.Entity("ExaminationSystem.Models.Question", b =>
+            modelBuilder.Entity("ExaminationSystem.DAL.Models.Question", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -272,7 +272,7 @@ namespace ExaminationSystem.Migrations
                     b.ToTable("Questions");
                 });
 
-            modelBuilder.Entity("ExaminationSystem.Models.RoleFeature", b =>
+            modelBuilder.Entity("ExaminationSystem.DAL.Models.RoleFeature", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -300,7 +300,7 @@ namespace ExaminationSystem.Migrations
                     b.ToTable("RoleFeatures");
                 });
 
-            modelBuilder.Entity("ExaminationSystem.Models.Student", b =>
+            modelBuilder.Entity("ExaminationSystem.DAL.Models.Student", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -326,7 +326,7 @@ namespace ExaminationSystem.Migrations
                     b.ToTable("Students");
                 });
 
-            modelBuilder.Entity("ExaminationSystem.Models.StudentAnswer", b =>
+            modelBuilder.Entity("ExaminationSystem.DAL.Models.StudentAnswer", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -368,7 +368,7 @@ namespace ExaminationSystem.Migrations
                     b.ToTable("StudentAnswers");
                 });
 
-            modelBuilder.Entity("ExaminationSystem.Models.User", b =>
+            modelBuilder.Entity("ExaminationSystem.DAL.Models.StudentCourse", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -376,42 +376,244 @@ namespace ExaminationSystem.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
+                    b.Property<int>("CourseID")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("Deleted")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("EnrollmentDate")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Role")
+                    b.Property<int>("StudentID")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("ID");
 
-                    b.ToTable("Users");
+                    b.HasIndex("CourseID");
+
+                    b.HasIndex("StudentID");
+
+                    b.ToTable("StudentCourse");
                 });
 
-            modelBuilder.Entity("ExaminationSystem.Models.Choice", b =>
+            modelBuilder.Entity("ExaminationSystem.DAL.Models.User", b =>
                 {
-                    b.HasOne("ExaminationSystem.Models.Question", "Question")
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex")
+                        .HasFilter("[NormalizedName] IS NOT NULL");
+
+                    b.ToTable("AspNetRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RoleId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetRoleClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProviderKey")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ProviderDisplayName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("LoginProvider", "ProviderKey");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserLogins", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RoleId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UserId", "LoginProvider", "Name");
+
+                    b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("ExaminationSystem.DAL.Models.Choice", b =>
+                {
+                    b.HasOne("ExaminationSystem.DAL.Models.Question", "Question")
                         .WithMany("Choices")
                         .HasForeignKey("QuestionId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -420,15 +622,15 @@ namespace ExaminationSystem.Migrations
                     b.Navigation("Question");
                 });
 
-            modelBuilder.Entity("ExaminationSystem.Models.Exam", b =>
+            modelBuilder.Entity("ExaminationSystem.DAL.Models.Exam", b =>
                 {
-                    b.HasOne("ExaminationSystem.Models.Course", "Course")
+                    b.HasOne("ExaminationSystem.DAL.Models.Course", "Course")
                         .WithMany("Exams")
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("ExaminationSystem.Models.Instructor", "Instructor")
+                    b.HasOne("ExaminationSystem.DAL.Models.Instructor", "Instructor")
                         .WithMany("Exams")
                         .HasForeignKey("InstructorId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -439,15 +641,15 @@ namespace ExaminationSystem.Migrations
                     b.Navigation("Instructor");
                 });
 
-            modelBuilder.Entity("ExaminationSystem.Models.ExamQuestion", b =>
+            modelBuilder.Entity("ExaminationSystem.DAL.Models.ExamQuestion", b =>
                 {
-                    b.HasOne("ExaminationSystem.Models.Exam", "Exam")
+                    b.HasOne("ExaminationSystem.DAL.Models.Exam", "Exam")
                         .WithMany("ExamQuestions")
                         .HasForeignKey("ExamId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("ExaminationSystem.Models.Question", "Question")
+                    b.HasOne("ExaminationSystem.DAL.Models.Question", "Question")
                         .WithMany("ExamQuestions")
                         .HasForeignKey("QuestionId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -458,15 +660,15 @@ namespace ExaminationSystem.Migrations
                     b.Navigation("Question");
                 });
 
-            modelBuilder.Entity("ExaminationSystem.Models.ExamStudent", b =>
+            modelBuilder.Entity("ExaminationSystem.DAL.Models.ExamStudent", b =>
                 {
-                    b.HasOne("ExaminationSystem.Models.Exam", "Exam")
+                    b.HasOne("ExaminationSystem.DAL.Models.Exam", "Exam")
                         .WithMany("ExamStudents")
                         .HasForeignKey("ExamId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("ExaminationSystem.Models.Student", "Student")
+                    b.HasOne("ExaminationSystem.DAL.Models.Student", "Student")
                         .WithMany("ExamStudents")
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -477,15 +679,15 @@ namespace ExaminationSystem.Migrations
                     b.Navigation("Student");
                 });
 
-            modelBuilder.Entity("ExaminationSystem.Models.Question", b =>
+            modelBuilder.Entity("ExaminationSystem.DAL.Models.Question", b =>
                 {
-                    b.HasOne("ExaminationSystem.Models.Course", "Course")
+                    b.HasOne("ExaminationSystem.DAL.Models.Course", "Course")
                         .WithMany("Questions")
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("ExaminationSystem.Models.Instructor", "Instructor")
+                    b.HasOne("ExaminationSystem.DAL.Models.Instructor", "Instructor")
                         .WithMany()
                         .HasForeignKey("InstructorId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -496,27 +698,27 @@ namespace ExaminationSystem.Migrations
                     b.Navigation("Instructor");
                 });
 
-            modelBuilder.Entity("ExaminationSystem.Models.StudentAnswer", b =>
+            modelBuilder.Entity("ExaminationSystem.DAL.Models.StudentAnswer", b =>
                 {
-                    b.HasOne("ExaminationSystem.Models.Choice", "Choice")
+                    b.HasOne("ExaminationSystem.DAL.Models.Choice", "Choice")
                         .WithMany("StudentAnswers")
                         .HasForeignKey("ChoiceID")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("ExaminationSystem.Models.Exam", "Exam")
+                    b.HasOne("ExaminationSystem.DAL.Models.Exam", "Exam")
                         .WithMany("StudentAnswers")
                         .HasForeignKey("ExamID")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("ExaminationSystem.Models.Question", "Question")
+                    b.HasOne("ExaminationSystem.DAL.Models.Question", "Question")
                         .WithMany("StudentAnswers")
                         .HasForeignKey("QuestionID")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("ExaminationSystem.Models.Student", "Student")
+                    b.HasOne("ExaminationSystem.DAL.Models.Student", "Student")
                         .WithMany("StudentAnswers")
                         .HasForeignKey("StudentID")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -531,19 +733,91 @@ namespace ExaminationSystem.Migrations
                     b.Navigation("Student");
                 });
 
-            modelBuilder.Entity("ExaminationSystem.Models.Choice", b =>
+            modelBuilder.Entity("ExaminationSystem.DAL.Models.StudentCourse", b =>
+                {
+                    b.HasOne("ExaminationSystem.DAL.Models.Course", "Course")
+                        .WithMany("StudentCourses")
+                        .HasForeignKey("CourseID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("ExaminationSystem.DAL.Models.Student", "Student")
+                        .WithMany("StudentCourses")
+                        .HasForeignKey("StudentID")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.HasOne("ExaminationSystem.DAL.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.HasOne("ExaminationSystem.DAL.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("ExaminationSystem.DAL.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.HasOne("ExaminationSystem.DAL.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ExaminationSystem.DAL.Models.Choice", b =>
                 {
                     b.Navigation("StudentAnswers");
                 });
 
-            modelBuilder.Entity("ExaminationSystem.Models.Course", b =>
+            modelBuilder.Entity("ExaminationSystem.DAL.Models.Course", b =>
                 {
                     b.Navigation("Exams");
 
                     b.Navigation("Questions");
+
+                    b.Navigation("StudentCourses");
                 });
 
-            modelBuilder.Entity("ExaminationSystem.Models.Exam", b =>
+            modelBuilder.Entity("ExaminationSystem.DAL.Models.Exam", b =>
                 {
                     b.Navigation("ExamQuestions");
 
@@ -552,12 +826,12 @@ namespace ExaminationSystem.Migrations
                     b.Navigation("StudentAnswers");
                 });
 
-            modelBuilder.Entity("ExaminationSystem.Models.Instructor", b =>
+            modelBuilder.Entity("ExaminationSystem.DAL.Models.Instructor", b =>
                 {
                     b.Navigation("Exams");
                 });
 
-            modelBuilder.Entity("ExaminationSystem.Models.Question", b =>
+            modelBuilder.Entity("ExaminationSystem.DAL.Models.Question", b =>
                 {
                     b.Navigation("Choices");
 
@@ -566,11 +840,13 @@ namespace ExaminationSystem.Migrations
                     b.Navigation("StudentAnswers");
                 });
 
-            modelBuilder.Entity("ExaminationSystem.Models.Student", b =>
+            modelBuilder.Entity("ExaminationSystem.DAL.Models.Student", b =>
                 {
                     b.Navigation("ExamStudents");
 
                     b.Navigation("StudentAnswers");
+
+                    b.Navigation("StudentCourses");
                 });
 #pragma warning restore 612, 618
         }
