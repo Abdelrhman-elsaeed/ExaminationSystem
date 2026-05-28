@@ -5,8 +5,8 @@
 
         public string Name { get; set; }
 
+        public ICollection<StudentCourse> StudentCourses { get; set; } 
         public ICollection<ExamStudent> ExamStudents { get; set; }
-
         public ICollection<StudentAnswer> StudentAnswers { get; set; }
     }
 }

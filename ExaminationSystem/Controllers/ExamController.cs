@@ -14,7 +14,6 @@
 
 
         [HttpPut]
-        [TypeFilter(typeof(CustomAuthorizeFilter), Arguments = new object[] { Feature.AddExam })]
         public async Task<IActionResult> Add(CreateExamVM model)
         {
             var CreateExamDTO = model.Map<CreateExamDTO>();
@@ -28,7 +27,6 @@
         }
 
         [HttpPut]
-        [TypeFilter(typeof(CustomAuthorizeFilter), Arguments = new object[] { Feature.AssignStudentToExam })]
         public async Task<IActionResult> AssignStudentToExam(CreateExamStudentVM model)
         {
             var ExamStudentDTO = model.Map<CreateExamStudentDTO>();
@@ -41,7 +39,6 @@
         }
 
         [HttpPut]
-        [TypeFilter(typeof(CustomAuthorizeFilter), Arguments = new object[] { Feature.AssignQuestionToExam })]
         public async Task<IActionResult> AssignQuestionToExam(AssignQuestionToExamVM model)
         {
             var AssignQuesionDTO = model.Map<AssignQuestionToExamDTO>();
@@ -56,7 +53,6 @@
         }
 
         [HttpPatch]
-        [TypeFilter(typeof(CustomAuthorizeFilter), Arguments = new object[] { Feature.UpdateExam })]
         public async Task<IActionResult> Update(UpdateExamVM model)
         {
             var UpdateDTO = model.Map<UpdateExamDTO>();
@@ -70,7 +66,6 @@
         }
 
         [HttpDelete]
-        [TypeFilter(typeof(CustomAuthorizeFilter), Arguments = new object[] { Feature.DeleteExam })]
         public async Task<IActionResult> DeleteExam(int id)
         {
             var resutl = await _ExamService.DeleteAsync(id);
@@ -82,7 +77,6 @@
         }
 
         [HttpPatch]
-        [TypeFilter(typeof(CustomAuthorizeFilter), Arguments = new object[] { Feature.UpdateQuestionOnExam })]
         public async Task<IActionResult> UpdateQuestionOnExam(UpdateExamQuestionVM model)
         {
             var UpdateDTO = model.Map<UpdateExamQuestionDTO>();
@@ -96,7 +90,6 @@
         }
 
         [HttpDelete]
-        [TypeFilter(typeof(CustomAuthorizeFilter), Arguments = new object[] { Feature.DeleteQuestionFromExam })]
         public async Task<IActionResult> DeleteQuestionFromExam(int id)
         {
             var result = await _ExamService.DeleteQuestoinFromExam(id);
@@ -108,7 +101,6 @@
         }
 
         [HttpGet]
-        [TypeFilter(typeof(CustomAuthorizeFilter), Arguments = new object[] { Feature.ViewExam })]
         public async Task<IActionResult> ViewExam(int ExamId)
         {
             var ViewExamDTO = await _ExamService.ViewExam(ExamId);
@@ -129,7 +121,6 @@
         }
 
         [HttpPut]
-        [TypeFilter(typeof(CustomAuthorizeFilter), Arguments = new object[] { Feature.SubmitExam })]
         public async Task<IActionResult> SubmitExam(SubmitExamVM model)
         {
             var SubmitExamDTO = model.Map<SubmitExamDTO>();
@@ -142,7 +133,6 @@
         }
 
         [HttpPut]
-        [TypeFilter(typeof(CustomAuthorizeFilter), Arguments = new object[] { Feature.CreateRandomExam })]
         public async Task<IActionResult> CreateRandomExam(CreateRandomExamVM model)
         {
             var RandomExamDTO = model.Map<CreateRandomExamDTO>();
@@ -157,7 +147,6 @@
         }
 
         [HttpGet]
-        [TypeFilter(typeof(CustomAuthorizeFilter), Arguments = new object[] { Feature.ViewStudentsGrades })]
         public async Task<IActionResult> ViewStudentsGrades(int ExamId)
         {
             var StudentsGradesDTO = await _ExamService.ViewStudentsGrades(ExamId);
@@ -174,7 +163,6 @@
         }
 
         [HttpGet]
-        [TypeFilter(typeof(CustomAuthorizeFilter), Arguments = new object[] { Feature.TopGrade })]
         public async Task<IActionResult> TopGrade(int ExamId)
         {
             var StudentsTopGrades = await _ExamService.TopGrade(ExamId);
@@ -188,7 +176,6 @@
         }
 
         [HttpGet]
-        [TypeFilter(typeof(CustomAuthorizeFilter), Arguments = new object[] { Feature.AverageGrade })]
         public async Task<IActionResult> AverageGrade(int ExamId)
         {
             var StudentAverageGrades = await _ExamService.AverageGrade(ExamId);

@@ -1,11 +1,17 @@
 ﻿
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+
 namespace ExaminationSystem.DAL.DataBase
 {
-    public class Context : DbContext
+    public class Context : IdentityDbContext<User>
     {
+        public Context(DbContextOptions<Context> options) : base(options)
+        {
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Data Source=.;Database=ExaminationSystem;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True;")
+            optionsBuilder
                 .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
                 .LogTo(log => Debug.WriteLine(log), LogLevel.Information)
                 .EnableSensitiveDataLogging();
@@ -38,6 +44,6 @@ namespace ExaminationSystem.DAL.DataBase
         public DbSet<Student> Students { get; set; }
         public DbSet<StudentAnswer> StudentAnswers { get; set; }
         public DbSet<User> Users { get; set; }
-        public DbSet<RoleFeature> RoleFeatures { get; set; }
+        // public DbSet<RoleFeature> RoleFeatures { get; set; }
     }
 }

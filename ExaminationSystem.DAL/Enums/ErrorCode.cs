@@ -40,6 +40,12 @@
         InvalidFeature = 404,
         FeatureAlreadyAssignedToRole = 405,
         AccessDenied = 406,
+        EmailAlreadyRegistered=407,
+        UsernameAlreadyRegistered=408,
+        RegisterationFail=409,
+        RoleNotFound=410,
+        RoleAssignedBefore=411,
+        AddRoleFail=412,
 
 
 
@@ -49,6 +55,15 @@
 
         AddCourseFail=600,
         UpdateCourseFail=601,
-        DeleteCourseFail=602
+        DeleteCourseFail=602,
+
+
+        StudentNotExist=700,
+
+
+        AssignStudentToCoursefail=800,
+        StudentAssignedBefore=801,
+        StudentNotAssignedToCourse=802,
+        DeleteStudentFromCourseFail=803,
     }
 }

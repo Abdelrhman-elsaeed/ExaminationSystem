@@ -13,7 +13,6 @@
         }
 
         [HttpPut]
-        [TypeFilter(typeof(CustomAuthorizeFilter),Arguments = new object[] { Feature.AddQuestion })]
         public async Task<ActionResult> Add(CreateQuestionVM model)
         {
             var newQuestionDto = model.Map<CreateQuestionDTO>();
@@ -26,7 +25,6 @@
         }
 
         [HttpDelete]
-        [TypeFilter(typeof(CustomAuthorizeFilter), Arguments = new object[] { Feature.DeleteQuestion })]
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _QuestionService.DeleteQuestionAndChoicesAsync(id);
@@ -35,7 +33,6 @@
         }
 
         [HttpGet]
-        [TypeFilter(typeof(CustomAuthorizeFilter), Arguments = new object[] { Feature.GetAllQuestions })]
         public async Task<IActionResult> GetAll()
         {
 
@@ -53,7 +50,6 @@
         }
 
         [HttpPatch]
-        [TypeFilter(typeof(CustomAuthorizeFilter), Arguments = new object[] { Feature.UpdateQuestion })]
         public async Task<IActionResult> UpdateQuestion(UpdateQuestionVM model)
         {
 
@@ -68,7 +64,6 @@
         }
 
         [HttpPatch]
-        [TypeFilter(typeof(CustomAuthorizeFilter), Arguments = new object[] { Feature.UpdateChoice })]
         public async Task<IActionResult> UpdateChoice(UpdateChoiceVM model)
         {
             var UpdateDTO = model.Map<UpdateChoiceDTO>();

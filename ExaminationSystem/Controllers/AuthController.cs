@@ -1,36 +1,76 @@
-﻿namespace ExaminationSystem.Controllers
+﻿using ExaminationSystem.BLL.Services.Interfaces;
+
+namespace ExaminationSystem.Controllers
 {
     [ApiController]
     [Route("[controller]/[action]")]
     public class AuthController : ControllerBase
     {
-        private readonly UserService _userService;
-        private readonly TokenGenerator _tokenGenerator;
+        private readonly IAuthService _authService;
 
-        public AuthController(UserService userService, TokenGenerator tokenGenerator)
+        public AuthController(IAuthService authService)
         {
-            _userService = userService;
-            _tokenGenerator = tokenGenerator;
+            _authService = authService;
         }
 
         [HttpPost]
-        public async Task<ActionResult> Login([FromBody] LoginRequestVM request)
+        public async Task<IActionResult> RegisterAsync([FromBody] RegisterVM model)
         {
-            var loginDto = new LoginRequestDto(request.Username, request.Password);
 
-            var result = await _userService.LoginAsync(loginDto);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = await _authService.RegisterAsync(model.Map<RegisterDto>());
 
             if (!result.IsSuccess)
-                return Unauthorized(result);
+            {
+                return BadRequest(ResponseViewModel<AuthVM>.Failure(result.ErrorCode,result.Message));
+            }
 
-            //Generate Token
-            var token = _tokenGenerator.Generate(
-                userId: result.Data!.Id,
-                name: result.Data.Name,
-                role: result.Data.Role);
+            return Ok(ResponseViewModel<AuthVM>.Success(result.Data.Map<AuthVM>(), message:result.Message));
 
-            return Ok(ResponseViewModel<LoginResponseVM>.Success (new LoginResponseVM(token, result.Data.Name, result.Data.Role)));
         }
 
+        [HttpPost]
+        public async Task<IActionResult> LoginAsync([FromBody] TokenRequestVM model)
+        {
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = await _authService.GetTokenAsync(model.Map<TokenRequestDto>());
+
+            if (!result.IsSuccess)
+            {
+                return BadRequest(ResponseViewModel<AuthVM>.Failure(result.ErrorCode, result.Message));
+            }
+
+            return Ok(ResponseViewModel<AuthVM>.Success(result.Data.Map<AuthVM>(), message: result.Message));
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddRoleAsync([FromBody] AddRoleVM model)
+        {
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = await _authService.AddRoleAsync(model.Map<AddRoleDto>());
+
+            if (!result.IsSuccess)
+            {
+                return BadRequest(ResponseViewModel<AddRoleVM>.Failure(result.ErrorCode, result.Message));
+            }
+
+            return Ok(ResponseViewModel<AddRoleVM>.Success(result.Data.Map<AddRoleVM>(), message: result.Message));
+
+        }
     }
 }
