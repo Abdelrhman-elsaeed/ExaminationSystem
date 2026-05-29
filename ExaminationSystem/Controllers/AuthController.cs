@@ -1,4 +1,4 @@
-using ExaminationSystem.BLL.Services.Interfaces;
+﻿using ExaminationSystem.BLL.Services.Interfaces;
 using ExaminationSystem.BLL.DTOs.Auth;
 using ExaminationSystem.BLL.ViewModels;
 using ExaminationSystem.BLL.ViewModels.Auth;
@@ -24,12 +24,7 @@ namespace ExaminationSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> RegisterAsync([FromBody] RegisterVM model, CancellationToken cancellationToken)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var result = await _authService.RegisterAsync(model.Map<RegisterDto>(), cancellationToken);
+var result = await _authService.RegisterAsync(model.Map<RegisterDto>(), cancellationToken);
 
             if (!result.IsSuccess)
             {
@@ -42,12 +37,7 @@ namespace ExaminationSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> LoginAsync([FromBody] TokenRequestVM model, CancellationToken cancellationToken)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var result = await _authService.GetTokenAsync(model.Map<TokenRequestDto>(), cancellationToken);
+var result = await _authService.GetTokenAsync(model.Map<TokenRequestDto>(), cancellationToken);
 
             if (!result.IsSuccess)
             {
@@ -61,12 +51,7 @@ namespace ExaminationSystem.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddRoleAsync([FromBody] AddRoleVM model, CancellationToken cancellationToken)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var result = await _authService.AddRoleAsync(model.Map<AddRoleDto>(), cancellationToken);
+var result = await _authService.AddRoleAsync(model.Map<AddRoleDto>(), cancellationToken);
 
             if (!result.IsSuccess)
             {

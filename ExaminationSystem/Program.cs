@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ExaminationSystem.DAL.Models;
 using ExaminationSystem.BLL.Services.Implementaiton;
+using ExaminationSystem.BLL.Validators;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 
 namespace ExaminationSystem
 {
@@ -17,6 +20,9 @@ namespace ExaminationSystem
 
             // Add services to the container.
             builder.Services.AddControllers();
+            builder.Services.AddFluentValidationAutoValidation();
+            builder.Services.AddValidatorsFromAssembly(typeof(RegisterVMValidator).Assembly);
+
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
