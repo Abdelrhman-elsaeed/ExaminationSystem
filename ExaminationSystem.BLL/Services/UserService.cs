@@ -1,100 +1,129 @@
-﻿
-//namespace ExaminationSystem.BLL.Services
-//{
-//    public class UserService
-//    {
-//        private readonly GenericRepository<User> _userRepo;
+﻿using ExaminationSystem.BLL.DTOs.Auth;
+using ExaminationSystem.BLL.DTOs.User;
+using ExaminationSystem.BLL.AutoMapper;
+using ExaminationSystem.BLL.Services.Interfaces;
+using ExaminationSystem.BLL.ViewModels;
+using ExaminationSystem.DAL.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-//        public UserService(GenericRepository<User> userRepo)
-//        {
-//            _userRepo = userRepo;
-//        }
+namespace ExaminationSystem.BLL.Services
+{
+    public class UserService
+    {
+        private readonly UserManager<User> _userManager;
+        private readonly IAuthService _authService;
 
-//        public async Task<bool> IsExistAsync(int id)
-//        {
-//            return await _userRepo.AnyAsync(u => u.ID == id && u.Deleted == false);
-//        }
+        public UserService(UserManager<User> userManager, IAuthService authService)
+        {
+            _userManager = userManager;
+            _authService = authService;
+        }
 
-//        public async Task<ResponseViewModel<bool>> AddAsync(AddUserDto model)
-//        {
-//            if (model is null || string.IsNullOrWhiteSpace(model.Username) || string.IsNullOrWhiteSpace(model.Password))
-//                return ResponseViewModel<bool>.Failure(ErrorCode.AddUserFail, "Invalid user input");
+        public async Task<bool> IsExistAsync(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            return user != null;
+        }
 
-//            var newUserModel = model.Map<User>();
-//            newUserModel.PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password);
+        public async Task<ResponseViewModel<bool>> AddAsync(AddUserDto model)
+        {
+            if (model is null || string.IsNullOrWhiteSpace(model.Username) || string.IsNullOrWhiteSpace(model.Password))
+                return ResponseViewModel<bool>.Failure(ErrorCode.AddUserFail, "Invalid user input");
 
-//            var result = await _userRepo.AddAsync(newUserModel);
+            var newUserModel = model.Map<User>();
 
-//            if (!result)
-//                return ResponseViewModel<bool>.Failure(ErrorCode.AddUserFail, "Failed to add user");
+            var result = await _userManager.CreateAsync(newUserModel, model.Password);
 
-//            return ResponseViewModel<bool>.Success(true, ErrorCode.None, "User added successfully");
-//        }
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                return ResponseViewModel<bool>.Failure(ErrorCode.AddUserFail, $"Failed to add user: {errors}");
+            }
 
-//        public async Task<ResponseViewModel<bool>> UpdateAsync(UpdateUserDto model)
-//        {
-//            if (model is null || model.ID <= 0)
-//                return ResponseViewModel<bool>.Failure(ErrorCode.UserNotFound, "Invalid user input");
+            var addRoleDto = new AddRoleDto { UserId = newUserModel.Id, Role = model.Role };
+            await _authService.AddRoleAsync(addRoleDto);
 
-//            var isExist = await IsExistAsync(model.ID);
-//            if (!isExist)
-//                return ResponseViewModel<bool>.Failure(ErrorCode.UserNotFound, "User not found");
+            return ResponseViewModel<bool>.Success(true, ErrorCode.None, "User added successfully");
+        }
 
-//            var updateModel = model.Map<User>();
+        public async Task<ResponseViewModel<bool>> UpdateAsync(UpdateUserDto model)
+        {
+            if (model is null || string.IsNullOrEmpty(model.ID))
+                return ResponseViewModel<bool>.Failure(ErrorCode.UserNotFound, "Invalid user input");
 
-//            var propertiesToUpdate = new List<string> { nameof(User.Name), nameof(User.Username), nameof(User.Role) };
+            var user = await _userManager.FindByIdAsync(model.ID);
+            if (user == null)
+                return ResponseViewModel<bool>.Failure(ErrorCode.UserNotFound, "User not found");
 
-//            if (!string.IsNullOrEmpty(model.Password))
-//            {
-//                updateModel.PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.Password);
-//                propertiesToUpdate.Add(nameof(User.PasswordHash));
-//            }
+            user.FirstName = model.FirstName;
+            user.LastName = model.LastName;
+            user.UserName = model.Username;
 
-//            var result = await _userRepo.UpdateInclude(updateModel, propertiesToUpdate.ToArray());
+            var result = await _userManager.UpdateAsync(user);
 
-//            if (!result)
-//                return ResponseViewModel<bool>.Failure(ErrorCode.UpdateUserFail, "Failed to update user");
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                return ResponseViewModel<bool>.Failure(ErrorCode.UpdateUserFail, $"Failed to update user: {errors}");
+            }
 
-//            return ResponseViewModel<bool>.Success(true, ErrorCode.None, "User updated successfully");
-//        }
+            if (!string.IsNullOrEmpty(model.Password))
+            {
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var passResult = await _userManager.ResetPasswordAsync(user, token, model.Password);
+                if (!passResult.Succeeded)
+                {
+                    return ResponseViewModel<bool>.Failure(ErrorCode.UpdateUserFail, "Failed to update user password");
+                }
+            }
 
-//        public async Task<ResponseViewModel<bool>> DeleteAsync(int id)
-//        {
-//            if (id <= 0)
-//                return ResponseViewModel<bool>.Failure(ErrorCode.UserNotFound, "Invalid user id");
+            var addRoleDto = new AddRoleDto { UserId = user.Id, Role = model.Role };
+            await _authService.AddRoleAsync(addRoleDto);
 
-//            var isExist = await IsExistAsync(id);
-//            if (!isExist)
-//                return ResponseViewModel<bool>.Failure(ErrorCode.UserNotFound, "User not found");
+            return ResponseViewModel<bool>.Success(true, ErrorCode.None, "User updated successfully");
+        }
 
-//            var result = await _userRepo.DeleteAsync(id);
-//            if (!result)
-//                return ResponseViewModel<bool>.Failure(ErrorCode.DeleteUserFail, "Failed to delete user");
+        public async Task<ResponseViewModel<bool>> DeleteAsync(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+                return ResponseViewModel<bool>.Failure(ErrorCode.UserNotFound, "Invalid user id");
 
-//            return ResponseViewModel<bool>.Success(true, ErrorCode.None, "User deleted successfully");
-//        }
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+                return ResponseViewModel<bool>.Failure(ErrorCode.UserNotFound, "User not found");
 
-//        public async Task<ResponseViewModel<IEnumerable<UserDto>>> GetAllAsync()
-//        {
-//            var users = await _userRepo.GetAll().ToListAsync();
+            var result = await _userManager.DeleteAsync(user);
+            if (!result.Succeeded)
+                return ResponseViewModel<bool>.Failure(ErrorCode.DeleteUserFail, "Failed to delete user");
 
-//            var result = users.Map<IEnumerable<UserDto>>();
+            return ResponseViewModel<bool>.Success(true, ErrorCode.None, "User deleted successfully");
+        }
 
-//            return ResponseViewModel<IEnumerable<UserDto>>.Success(result, ErrorCode.None, "Users retrieved successfully");
-//        }
+        public async Task<ResponseViewModel<IEnumerable<UserDto>>> GetAllAsync()
+        {
+            var users = await _userManager.Users.ToListAsync();
 
-//        public async Task<ResponseViewModel<UserDto>> GetByIdAsync(int id)
-//        {
-//            if (id <= 0)
-//                return ResponseViewModel<UserDto>.Failure(ErrorCode.UserNotFound, "Invalid user id");
+            var result = users.Map<IEnumerable<UserDto>>();
 
-//            var user = await _userRepo.GetByIdAsync(id);
+            return ResponseViewModel<IEnumerable<UserDto>>.Success(result, ErrorCode.None, "Users retrieved successfully");
+        }
 
-//            if (user is null)
-//                return ResponseViewModel<UserDto>.Failure(ErrorCode.UserNotFound, "User not found");
+        public async Task<ResponseViewModel<UserDto>> GetByIdAsync(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+                return ResponseViewModel<UserDto>.Failure(ErrorCode.UserNotFound, "Invalid user id");
 
-//            var result = user.Map<UserDto>();
-//            return ResponseViewModel<UserDto>.Success(result, ErrorCode.None, "User retrieved successfully");
-//        }
-//    }
-//}
+            var user = await _userManager.FindByIdAsync(id);
+
+            if (user is null)
+                return ResponseViewModel<UserDto>.Failure(ErrorCode.UserNotFound, "User not found");
+
+            var result = user.Map<UserDto>();
+            return ResponseViewModel<UserDto>.Success(result, ErrorCode.None, "User retrieved successfully");
+        }
+    }
+}
