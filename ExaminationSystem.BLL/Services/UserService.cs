@@ -10,24 +10,6 @@
 //            _userRepo = userRepo;
 //        }
 
-//        public async Task<ResponseViewModel<UserAuthResultDto>> LoginAsync(LoginRequestDto model)
-//        {
-//            if (model is null)
-//                return ResponseViewModel<UserAuthResultDto>.Failure(ErrorCode.InvalidCredentials, "Invalid login input");
-
-//            var user = await _userRepo.Get(u => u.Username == model.Username && u.Deleted == false).FirstOrDefaultAsync();
-
-//            if (user is null)
-//                return ResponseViewModel<UserAuthResultDto>.Failure(ErrorCode.UserNotFound, "User not found");
-
-//            bool isPasswordValid = BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash);
-
-//            if (!isPasswordValid)
-//                return ResponseViewModel<UserAuthResultDto>.Failure(ErrorCode.InvalidCredentials, "Password is not correct");
-
-//            return ResponseViewModel<UserAuthResultDto>.Success(new UserAuthResultDto(user.ID, user.Name, user.Role.ToString()), ErrorCode.None, "Login success");
-//        }
-
 //        public async Task<bool> IsExistAsync(int id)
 //        {
 //            return await _userRepo.AnyAsync(u => u.ID == id && u.Deleted == false);

@@ -54,6 +54,7 @@ namespace ExaminationSystem.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddRoleAsync([FromBody] AddRoleVM model)
         {
 
