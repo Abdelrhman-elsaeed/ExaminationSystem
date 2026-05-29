@@ -289,6 +289,29 @@ Passed!  - Failed: 0, Passed: 32, Skipped: 0, Total: 32
 
 ---
 
+## 🔮 Roadmap & Future Enhancements
+
+To demonstrate scalability awareness and readiness for enterprise-level demands, the following architectural upgrades are planned for the next iteration:
+
+- **🚀 Distributed Caching (Redis)**
+  - Implement Redis to cache read-heavy, infrequently changing data such as the `Course` catalog and `Exam` definitions. This will drastically reduce database hits and improve endpoint response times.
+  - *Strategy*: Use the Cache-Aside pattern with robust invalidation policies upon data modification.
+
+- **📨 Event-Driven Architecture (RabbitMQ)**
+  - Offload the `SubmitExam` grading process to a background worker using a message broker. When a student submits an exam, publish an `ExamSubmittedEvent`. A consumer will pick it up, grade it asynchronously, and trigger an email notification, ensuring the API remains highly responsive during peak exam periods.
+
+- **🛡️ Resilience & Fault Tolerance (Polly)**
+  - Integrate Polly to handle transient database connection failures or external API timeouts gracefully using Retry and Circuit Breaker patterns.
+
+- **📊 Observability & Structured Logging (Serilog + ELK/Seq)**
+  - Replace default logging with Serilog to capture rich, structured logs. 
+  - Centralize log aggregation using Elasticsearch/Kibana or Seq to monitor application health, track user journeys, and quickly debug issues in a production environment.
+
+- **📦 Containerization (Docker)**
+  - Dockerize the API and its dependencies (SQL Server, Redis) into isolated containers using `docker-compose`, ensuring a consistent "works on my machine" experience across all deployment environments.
+
+---
+
 <div align="center">
 
 *This README was designed not just to explain how to run the project, but to document the engineering mindset and architectural decisions behind it.*
