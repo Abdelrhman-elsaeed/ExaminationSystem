@@ -14,6 +14,7 @@
 
 
         [HttpPut]
+        [Authorize(Roles = "Instructor")]
         public async Task<IActionResult> Add(CreateExamVM model)
         {
             var CreateExamDTO = model.Map<CreateExamDTO>();
@@ -27,6 +28,7 @@
         }
 
         [HttpPut]
+        [Authorize(Roles = "Instructor")]
         public async Task<IActionResult> AssignStudentToExam(CreateExamStudentVM model)
         {
             var ExamStudentDTO = model.Map<CreateExamStudentDTO>();
@@ -39,6 +41,7 @@
         }
 
         [HttpPut]
+        [Authorize(Roles = "Instructor")]
         public async Task<IActionResult> AssignQuestionToExam(AssignQuestionToExamVM model)
         {
             var AssignQuesionDTO = model.Map<AssignQuestionToExamDTO>();
@@ -53,6 +56,7 @@
         }
 
         [HttpPatch]
+        [Authorize(Roles = "Instructor")]
         public async Task<IActionResult> Update(UpdateExamVM model)
         {
             var UpdateDTO = model.Map<UpdateExamDTO>();
@@ -66,6 +70,7 @@
         }
 
         [HttpDelete]
+        [Authorize(Roles = "Instructor")]
         public async Task<IActionResult> DeleteExam(int id)
         {
             var resutl = await _ExamService.DeleteAsync(id);
@@ -77,6 +82,7 @@
         }
 
         [HttpPatch]
+        [Authorize(Roles = "Instructor")]
         public async Task<IActionResult> UpdateQuestionOnExam(UpdateExamQuestionVM model)
         {
             var UpdateDTO = model.Map<UpdateExamQuestionDTO>();
@@ -90,6 +96,7 @@
         }
 
         [HttpDelete]
+        [Authorize(Roles = "Instructor")]
         public async Task<IActionResult> DeleteQuestionFromExam(int id)
         {
             var result = await _ExamService.DeleteQuestoinFromExam(id);
@@ -101,6 +108,7 @@
         }
 
         [HttpGet]
+        [Authorize(Roles = "Student")]
         public async Task<IActionResult> ViewExam(int ExamId)
         {
             var ViewExamDTO = await _ExamService.ViewExam(ExamId);
@@ -121,6 +129,7 @@
         }
 
         [HttpPut]
+        [Authorize(Roles = "Student")]
         public async Task<IActionResult> SubmitExam(SubmitExamVM model)
         {
             var SubmitExamDTO = model.Map<SubmitExamDTO>();
@@ -133,6 +142,7 @@
         }
 
         [HttpPut]
+        [Authorize(Roles = "Instructor")]
         public async Task<IActionResult> CreateRandomExam(CreateRandomExamVM model)
         {
             var RandomExamDTO = model.Map<CreateRandomExamDTO>();
@@ -147,6 +157,7 @@
         }
 
         [HttpGet]
+        [Authorize(Roles = "Instructor")]
         public async Task<IActionResult> ViewStudentsGrades(int ExamId)
         {
             var StudentsGradesDTO = await _ExamService.ViewStudentsGrades(ExamId);
@@ -163,6 +174,8 @@
         }
 
         [HttpGet]
+
+        [Authorize(Roles = "Instructor")]
         public async Task<IActionResult> TopGrade(int ExamId)
         {
             var StudentsTopGrades = await _ExamService.TopGrade(ExamId);
@@ -176,6 +189,7 @@
         }
 
         [HttpGet]
+        [Authorize(Roles = "Instructor")]
         public async Task<IActionResult> AverageGrade(int ExamId)
         {
             var StudentAverageGrades = await _ExamService.AverageGrade(ExamId);

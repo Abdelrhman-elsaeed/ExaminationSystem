@@ -3,7 +3,7 @@
 
     [ApiController]
     [Route("[controller]/[action]")]
-    [Authorize]
+    [Authorize(Roles = "Instructor")]
     public class QuestionController : ControllerBase
     {
         private readonly QuestionService _QuestionService;

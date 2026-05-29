@@ -46,6 +46,7 @@ namespace ExaminationSystem.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Instructor")]
         public async Task<IActionResult> Add([FromBody] CreateCourseVM model)
         {
 
@@ -59,6 +60,7 @@ namespace ExaminationSystem.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Instructor")]
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _CourseService.DeleteAsync(id);
@@ -70,6 +72,7 @@ namespace ExaminationSystem.Controllers
         }
 
         [HttpPatch]
+        [Authorize(Roles = "Instructor")]
         public async Task<IActionResult> Update([FromBody] UpdateCourseVM model)
         {
             var courseDTO = model.Map<UpdateCourseDTO>();
