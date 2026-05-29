@@ -25,6 +25,10 @@
 ## ✨ Highlighted Features
 
 - **🏢 N-Tier Architecture**: Strict separation of concerns keeping the Presentation, Business Logic, and Data Access layers independent.
+- **🛡️ Custom Middlewares**:
+  - `GlobalErrorHandlerMiddleware`: Centralized exception handling to ensure consistent API error responses globally.
+  - `TransactionMiddleware`: Automatically manages database transactions per request to guarantee data integrity during complex flows (like exam submission).
+- **🔍 Advanced Queries & Pagination**: Efficient data retrieval using server-side pagination to handle large datasets of students, courses, or exam results.
 - **🎲 Dynamic Random Exams**: Ability to automatically generate random exams based on specific configurations (question counts, difficulty levels, and grades per course).
 - **💯 Automated Grading Engine**: Secure evaluation of submitted student answers against correct choices, calculating final grades automatically.
 - **🗄️ Repository Pattern**: Implementing `GenericRepository` alongside specific repositories to completely decouple data access logic from business services.
