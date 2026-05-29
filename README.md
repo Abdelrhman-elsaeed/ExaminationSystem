@@ -62,25 +62,56 @@ The project was built with ASP.NET Core, Entity Framework Core, SQL Server, ASP.
 └─────────────────────────────────────────────┘
 ```
 
-## 🏗️ Architecture Decision Records (ADRs)
 
-> *"Programming is no longer just code that runs.. Programming has become documenting your thinking and architecture for your decisions."*
 
-Here are the key architectural questions and decisions made during the design phase:
+## 🏗️ Architecture Decisions
+
+This section explains the main technical decisions behind the project and why they were used.
 
 ### 1. Why N-Tier Architecture?
-- **Decision:** Use N-Tier Architecture.
-- **Advantages:** It is highly intuitive, providing a clean and direct separation between the Database, Business Rules, and API endpoints. It keeps the project easy to onboard for new developers while still allowing for strict dependency flows (API -> BLL -> DAL).
-- **Trade-offs:** Compared to Onion/Clean architecture, the Domain (Models) is tied to the DAL rather than sitting at the center, but this trade-off is acceptable for a data-centric application heavily relying on Entity Framework Core.
+
+The project uses N-Tier Architecture to separate the application into three main layers:
+
+- **API Layer**: Handles HTTP requests, controllers, authentication, and authorization.
+- **Business Logic Layer (BLL)**: Contains services, DTOs, validation, and application rules.
+- **Data Access Layer (DAL)**: Contains Entity Framework Core, repositories, migrations, and database models.
+
+This structure keeps controllers focused on handling requests, while the business logic stays inside services and database access stays inside repositories.
+
+For this project, N-Tier was a good fit because the system is mainly data-driven and has clear modules such as courses, exams, questions, students, and grades.
+
+**Trade-off:**  
+Compared to Clean Architecture, the domain models are closer to the data access layer. This is acceptable for the current project size, but if the project grows, moving the domain models into a separate Domain layer would make the design more flexible.
 
 ### 2. Why ASP.NET Core Identity?
-- **Decision:** Migrate from Custom Auth to ASP.NET Core Identity.
-- **Advantages:** Provides battle-tested security for hashing passwords, generating tokens, managing user stores, and role-based authorization without reinventing the wheel.
-- **Integration:** Seamlessly ties into `UserManager<User>` and `RoleManager<IdentityRole>`, allowing for robust JWT token generation and role verification endpoints.
+
+Authentication and user management are handled using ASP.NET Core Identity instead of building a custom authentication system from scratch.
+
+Identity provides built-in support for:
+
+- Password hashing
+- User registration and login
+- Role management
+- User lookup and validation
+- Integration with Entity Framework Core
+
+The project uses Identity with JWT authentication to protect API endpoints and support role-based access for admins, instructors, and students.
+
+This keeps the authentication logic more reliable and avoids writing sensitive security code manually.
 
 ### 3. Why Generic Repository Pattern?
-- **Decision:** Centralize data operations using `IRepository<T>`.
-- **Advantages:** Drastically reduces boilerplate code across the Data Access Layer. Standard operations (`AddAsync`, `CheckExistsByConditionAsync`, `SoftDelete`) are implemented once, making the Business Logic Layer highly testable via Moq.
+
+The project uses a generic repository to keep common database operations in one place.
+
+Instead of repeating methods like adding, updating, deleting, checking existence, and querying entities in every repository, these shared operations are implemented once in `IRepository<T>` and reused across the application.
+
+This makes the service layer easier to test because repositories can be mocked during unit testing.
+
+For more specific queries, such as loading an exam with its questions and choices, dedicated repository methods can still be added when needed.
+
+**Trade-off:**  
+Entity Framework Core already provides repository-like behavior through `DbContext` and `DbSet`. Because of that, the generic repository should stay simple and should not try to hide every EF Core feature.
+
 
 ---
 
