@@ -324,9 +324,6 @@ To demonstrate scalability awareness and readiness for enterprise-level demands,
 - **📨 Event-Driven Architecture (RabbitMQ)**
   - Offload the `SubmitExam` grading process to a background worker using a message broker. When a student submits an exam, publish an `ExamSubmittedEvent`. A consumer will pick it up, grade it asynchronously, and trigger an email notification, ensuring the API remains highly responsive during peak exam periods.
 
-- **🛡️ Resilience & Fault Tolerance (Polly)**
-  - Integrate Polly to handle transient database connection failures or external API timeouts gracefully using Retry and Circuit Breaker patterns.
-
 - **📊 Observability & Structured Logging (Serilog + ELK/Seq)**
   - Replace default logging with Serilog to capture rich, structured logs. 
   - Centralize log aggregation using Elasticsearch/Kibana or Seq to monitor application health, track user journeys, and quickly debug issues in a production environment.
