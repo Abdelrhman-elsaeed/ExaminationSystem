@@ -83,23 +83,7 @@ For this project, N-Tier was a good fit because the system is mainly data-driven
 **Trade-off:**  
 Compared to Clean Architecture, the domain models are closer to the data access layer. This is acceptable for the current project size, but if the project grows, moving the domain models into a separate Domain layer would make the design more flexible.
 
-### 2. Why ASP.NET Core Identity?
-
-Authentication and user management are handled using ASP.NET Core Identity instead of building a custom authentication system from scratch.
-
-Identity provides built-in support for:
-
-- Password hashing
-- User registration and login
-- Role management
-- User lookup and validation
-- Integration with Entity Framework Core
-
-The project uses Identity with JWT authentication to protect API endpoints and support role-based access for admins, instructors, and students.
-
-This keeps the authentication logic more reliable and avoids writing sensitive security code manually.
-
-### 3. Why Generic Repository Pattern?
+### 2. Why Generic Repository Pattern?
 
 The project uses a generic repository to keep common database operations in one place.
 
