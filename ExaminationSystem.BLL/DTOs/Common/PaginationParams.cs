@@ -1,4 +1,4 @@
-namespace ExaminationSystem.BLL.DTOs.Common
+﻿namespace ExaminationSystem.BLL.DTOs.Common
 {
     public class PaginationParams
     {
