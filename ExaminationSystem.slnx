@@ -2,4 +2,5 @@
   <Project Path="ExaminationSystem.BLL/ExaminationSystem.BLL.csproj" Id="31b9c911-52f8-439b-97c8-e636fa11e8ad" />
   <Project Path="ExaminationSystem.DAL/ExaminationSystem.DAL.csproj" Id="4b8677c1-99bc-4274-b6f6-0988573deb91" />
   <Project Path="ExaminationSystem/ExaminationSystem.csproj" />
+  <Project Path="ExaminationSys.UnitTests/ExaminationSys.UnitTests.csproj" />
 </Solution>

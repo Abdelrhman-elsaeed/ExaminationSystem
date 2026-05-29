@@ -1,4 +1,4 @@
-﻿namespace ExaminationSystem.DAL.Enums
+namespace ExaminationSystem.DAL.Enums
 {
     public enum ErrorCode
     {
@@ -10,6 +10,7 @@
         QuestionAddFail = 102,
         QuestionDeleteFail = 103,
         QuestoinChoicesTransactionFail = 104,
+        SaveQuestionFail = 105,
 
         ChoiceUpdateFail = 200,
         ChoiceDeleteFail = 201,
@@ -31,6 +32,7 @@
         StudentNotAssignedToExam = 313,
         NoQuestionsAssignedToExam = 314,
         SubmitExamFail = 315,
+        SaveExamFail = 316,
 
 
         InvalidCredentials = 400,
@@ -56,6 +58,7 @@
         AddCourseFail=600,
         UpdateCourseFail=601,
         DeleteCourseFail=602,
+        SaveCourseFail=603,
 
 
         StudentNotExist=700,

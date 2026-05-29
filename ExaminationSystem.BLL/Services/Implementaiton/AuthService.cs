@@ -1,4 +1,4 @@
-﻿using ExaminationSystem.BLL.Helper.JWT;
+using ExaminationSystem.BLL.Helper.JWT;
 using ExaminationSystem.BLL.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
@@ -7,7 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace ExaminationSystem.BLL.Services
+namespace ExaminationSystem.BLL.Services.Implementaiton
 {
     public class AuthService : IAuthService
     {
@@ -58,7 +58,7 @@ namespace ExaminationSystem.BLL.Services
             return token;
         }
 
-        public async Task<ResponseViewModel<AuthDto>> RegisterAsync(RegisterDto model)
+        public async Task<ResponseViewModel<AuthDto>> RegisterAsync(RegisterDto model, CancellationToken cancellationToken = default)
         {
             if (await _userManager.FindByEmailAsync(model.Email) is not null)
             {
@@ -95,7 +95,7 @@ namespace ExaminationSystem.BLL.Services
 
             return ResponseViewModel<AuthDto>.Success(authDto,message:"User registered successfully");
         }
-        public async Task<ResponseViewModel<AuthDto>> GetTokenAsync(TokenRequestDto model)
+        public async Task<ResponseViewModel<AuthDto>> GetTokenAsync(TokenRequestDto model, CancellationToken cancellationToken = default)
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
 
@@ -118,7 +118,7 @@ namespace ExaminationSystem.BLL.Services
 
             return ResponseViewModel<AuthDto>.Success(authDto, ErrorCode.None, "Login successful");
         }
-        public async Task<ResponseViewModel<AddRoleDto>> AddRoleAsync(AddRoleDto model)
+        public async Task<ResponseViewModel<AddRoleDto>> AddRoleAsync(AddRoleDto model, CancellationToken cancellationToken = default)
         {
             var user = await _userManager.FindByIdAsync(model.UserId);
             if (user is null)

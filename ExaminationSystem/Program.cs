@@ -4,6 +4,8 @@ using ExaminationSystem.BLL.Services.Interfaces;
 using ExaminationSystem.Middlewares;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using ExaminationSystem.DAL.Models;
+using ExaminationSystem.BLL.Services.Implementaiton;
 
 namespace ExaminationSystem
 {
@@ -50,16 +52,18 @@ namespace ExaminationSystem
 
 
             //dependency injection
-            builder.Services.AddScoped(typeof(GenericRepository<>));
+            builder.Services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
             builder.Services.AddScoped<Context>();
-            builder.Services.AddScoped<QuestionService>();
-            builder.Services.AddScoped<ChoiceService>();
-            builder.Services.AddScoped<CourseService>();
-            builder.Services.AddScoped<InstructorService>();
-            builder.Services.AddScoped<ExamQuestionService>();
-            builder.Services.AddScoped<ExamStudentService>();
-            builder.Services.AddScoped<ExamService>();
-            //builder.Services.AddScoped<UserService>();
+            builder.Services.AddScoped<IQuestionService, QuestionService>();
+            builder.Services.AddScoped<IChoiceService, ChoiceService>();
+            builder.Services.AddScoped<ICourseService, CourseService>();
+            builder.Services.AddScoped<IInstructorService, InstructorService>();
+            builder.Services.AddScoped<IExamQuestionService, ExamQuestionService>();
+            builder.Services.AddScoped<IExamStudentService, ExamStudentService>();
+            builder.Services.AddScoped<IExamService, ExamService>();
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IStudentService, StudentService>();
+            builder.Services.AddScoped<IStudnetCourseService, StudnetCourseService>();
             builder.Services.AddScoped<User>();
             builder.Services.AddScoped<IAuthService, AuthService>();
 

@@ -1,102 +1,112 @@
-﻿
+using ExaminationSystem.DAL.Models;
+using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
+using System.Linq;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using System;
+
 namespace ExaminationSystem.DAL.Repo
 {
-    public class GenericRepository<T> where T : BaseModel
+    public class GenericRepository<T> : IRepository<T> where T : BaseModel
     {
-
         protected readonly Context _Context;
         protected DbSet<T> _dbSet;
+        private static readonly string[] ImmutableFieldNames = { nameof(BaseModel.ID), nameof(BaseModel.CreatedAt), nameof(BaseModel.UpdatedAt) };
 
         public GenericRepository(Context Context)
         {
             _Context = Context;
             _dbSet = _Context.Set<T>();
         }
-        public IQueryable<T> GetAll()
-        {
 
-            return _dbSet.Where(x => !x.Deleted);
-        }
-        public IQueryable<T> Get(Expression<Func<T, bool>> expression)
+        public async Task<T> AddAsync(T entity, CancellationToken cancellationToken = default)
         {
-            return GetAll().Where(expression);
-
-        }
-        public async Task<T?> GetByIdAsync(int id)
-        {
-            return await _dbSet.FirstOrDefaultAsync(x => x.ID == id && x.Deleted == false);
-        }
-        public async Task<T?> GetByIdWithTrackingAsync(int id)
-        {
-            return await _dbSet.AsTracking()
-                .FirstOrDefaultAsync(x => x.ID == id && x.Deleted == false);
-        }
-        public async Task<bool> AddAsync(T model)
-        {
-            _dbSet.Add(model);
-            var savedRows = await _Context.SaveChangesAsync();
-
-            return savedRows > 0;
-        }
-        public async Task<bool> AddRangeAsync(IEnumerable<T> models)
-        {
-            var modelList = models?.ToList();
-
-            if (modelList is null || modelList.Count == 0)
-                return false;
-
-            _dbSet.AddRange(modelList);
-            var savedRows = await _Context.SaveChangesAsync();
-
-            return savedRows > 0;
-        }
-        public async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate)
-        {
-            return await _dbSet.AnyAsync(predicate);
+            var result = await _Context.AddAsync(entity, cancellationToken);
+            return result.Entity;
         }
 
-        //----------------------------------------------
-        public async Task<bool> UpdateInclude(T model, params string[] modifiedProperties)
+        public async Task<bool> CheckExistsByConditionAsync(Expression<Func<T, bool>> expression, CancellationToken cancellationToken = default)
         {
-            if (!await _dbSet.AnyAsync(x => x.ID == model.ID && !x.Deleted))
-                return false;
+            return await _dbSet.AnyAsync(expression, cancellationToken);
+        }
 
-            var local = _dbSet.Local.FirstOrDefault(x => x.ID == model.ID);
-            EntityEntry entityEntry;
+        public async Task<bool> CheckExistsByIDAsync(int id, CancellationToken cancellationToken = default)
+        {
+            return await CheckExistsByConditionAsync(x => x.ID == id, cancellationToken);
+        }
 
-            if (local is null)
-                entityEntry = _Context.Entry(model);
-            else
-                entityEntry = _Context.ChangeTracker.Entries<T>().FirstOrDefault(x => x.Entity.ID == model.ID);
+        public void SoftDelete(T entity)
+        {
+            entity.Deleted = true;
+            UpdateInclude(entity, nameof(entity.Deleted));
+        }
 
-            foreach (var prop in entityEntry.Properties)
+        public void UpdateInclude(T entity, params string[] properties)
+        {
+            properties = properties.Except(ImmutableFieldNames).ToArray();
+
+            var changeTrackerEntry = _dbSet.Local.FirstOrDefault(x => x.ID == entity.ID);
+            var entry = changeTrackerEntry != null ? _Context.Entry(changeTrackerEntry) : _Context.Entry(entity);
+
+            var entityType = entity.GetType();
+
+            entity.UpdatedAt = DateTime.Now;
+            foreach (var entryProperty in entry.Properties)
             {
-                if (modifiedProperties.Contains(prop.Metadata.Name))
+                if (properties.Contains(entryProperty.Metadata.Name))
                 {
-                    prop.CurrentValue = model.GetType().GetProperty(prop.Metadata.Name).GetValue(model);
-                    prop.IsModified = true;
+                    entryProperty.CurrentValue = entityType.GetProperty(entryProperty.Metadata.Name)!.GetValue(entity);
+                    entryProperty.IsModified = true;
                 }
             }
-
-            var savedRows = await _Context.SaveChangesAsync();
-            return savedRows > 0;
-
         }
-        public async Task<bool> DeleteAsync(int id)
+
+        public IQueryable<T> GetAll()
         {
-            var updatedRows = await _dbSet
-                .Where(x => x.ID == id && x.Deleted == false)
-                .ExecuteUpdateAsync(x => x.SetProperty(x => x.Deleted, true));
-
-            return updatedRows > 0;
+            return _dbSet.Where(x => x.Deleted == false);
         }
-        public async Task<int> DeleteRangeAsync(Expression<Func<T, bool>> predicate)
+
+        public IQueryable<T> GetByCondition(Expression<Func<T, bool>> expression)
         {
-            var updatedRows = await _dbSet.Where(predicate).Where(x => x.Deleted == false)
-                .ExecuteUpdateAsync(x => x.SetProperty(prop => prop.Deleted, true));
-
-            return updatedRows;
+            return GetAll().Where(expression);
         }
 
+        public IQueryable<T> GetByID(int id)
+        {
+            return GetByCondition(x => x.ID == id);
+        }
+
+        public async Task<T?> GetByConditionAsync(Expression<Func<T, bool>> expression, CancellationToken cancellationToken = default)
+        {
+            return await GetByCondition(expression).FirstOrDefaultAsync(cancellationToken);
+        }
+
+        public async Task<T?> GetByIDAsync(int id, CancellationToken cancellationToken = default)
+        {
+            return await GetByConditionAsync(x => x.ID == id, cancellationToken);
+        }
+
+        public async Task<bool> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            var RowSaved = await _Context.SaveChangesAsync(cancellationToken);
+            return RowSaved > 0;
+        }
+
+        public void DeleteRange(IEnumerable<T> entities)
+        {
+            _dbSet.RemoveRange(entities);
+        }
+
+        public async Task<List<T>> GetAllByConditionAsync(Expression<Func<T, bool>> expression, CancellationToken cancellationToken = default)
+        {
+            return await GetByCondition(expression).ToListAsync(cancellationToken);
+        }
+
+        public IQueryable<T> GetAllWithDeleted()
+        {
+            return _dbSet.AsQueryable();
+        }
     }
 }
