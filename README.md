@@ -22,8 +22,8 @@
 Examination System is a Web API for managing online exams in an educational environment.
 
 The system allows admins and instructors to manage courses, questions, exams, students, and exam assignments. Students can take assigned exams, submit their answers, and receive calculated grades automatically.
-
 The project was built with ASP.NET Core, Entity Framework Core, SQL Server, ASP.NET Core Identity, and JWT authentication. It follows an N-Tier architecture to keep the API, business logic, and data access layers separated and easier to maintain.
+
 ---
 
 ## ✨ Highlighted Features
