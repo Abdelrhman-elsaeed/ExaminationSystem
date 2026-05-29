@@ -1,4 +1,4 @@
-# 🎓 Examination System Web API
+# Examination System Web API
 
 <div align="center">
 
@@ -34,6 +34,7 @@
 - **🗄️ Repository Pattern**: Implementing `GenericRepository` alongside specific repositories to completely decouple data access logic from business services.
 - **🔐 Security & Identity**: Comprehensive JWT-based Authentication and Authorization leveraging ASP.NET Core Identity for Role Management (Admin, Instructor, Student).
 - **🗺️ Object Mapping**: Using `AutoMapper` to map between Domain Entities, DTOs, and ViewModels smoothly.
+- **✔️ FluentValidation Pipeline**: Completely isolated DTO validation using `FluentValidation`, automatically intercepting bad requests before they ever hit the controllers, ensuring perfectly clean APIs.
 - **🧪 Comprehensive Unit Testing**: 30+ tests validating all major business logic services using Moq and FluentAssertions.
 
 ---
