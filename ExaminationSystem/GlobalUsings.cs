@@ -1,4 +1,4 @@
-﻿global using System;
+global using System;
 global using System.Collections.Generic;
 global using System.Linq;
 global using System.Threading.Tasks;
@@ -24,6 +24,9 @@ global using ExaminationSystem.BLL.DTOs.Choice;
 global using ExaminationSystem.BLL.DTOs.Question;
 global using ExaminationSystem.BLL.DTOs.User;
 global using ExaminationSystem.BLL.ViewModels.User;
+global using ExaminationSystem.BLL.DTOs.StudentCourse;
+global using ExaminationSystem.BLL.ViewModels.StudentCourse;
+global using ExaminationSystem.BLL.DTOs.Common;
 global using ExaminationSystem.DAL.DataBase;
 global using ExaminationSystem.DAL.Models;
 global using ExaminationSystem.DAL.Repo;
