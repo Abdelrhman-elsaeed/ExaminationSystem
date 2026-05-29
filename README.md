@@ -2,15 +2,15 @@
 
 <div align="center">
 
-![.NET](https://img.shields.io/badge/.NET-Core-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
-![C#](https://img.shields.io/badge/C%23-Backend-239120?style=for-the-badge&logo=c-sharp&logoColor=white)
+![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
+![C#](https://img.shields.io/badge/C%23-12-239120?style=for-the-badge&logo=c-sharp&logoColor=white)
 ![SQL Server](https://img.shields.io/badge/SQL%20Server-CC2927?style=for-the-badge&logo=microsoft-sql-server&logoColor=white)
-![Entity Framework Core](https://img.shields.io/badge/EF%20Core-ORM-3FA037?style=for-the-badge)
-![Status](https://img.shields.io/badge/Status-In%20Progress-yellow?style=for-the-badge)
+![Tests](https://img.shields.io/badge/Tests-32%20Passing-brightgreen?style=for-the-badge)
+![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
-**A robust, scalable, and highly maintainable backend API for managing online courses, quizzes, and final exams.**
+**A highly maintainable, scalable, and testable Examination System API built on N-Tier Architecture**
 
-[Features](#-highlighted-features) • [Architecture](#-architecture) • [Database](#️-database) • [Roadmap](#-roadmap--status) • [Getting Started](#-getting-started)
+[Features](#-highlighted-features) • [Architecture & ADRs](#-architecture-decision-records-adrs) • [Database](#️-database) • [Testing](#-unit-testing) • [Getting Started](#-getting-started)
 
 </div>
 
@@ -18,112 +18,141 @@
 
 ## 📖 Overview
 
-**Examination System** is an online platform backend designed to allow instructors to create and manage courses, question banks, and exams. Students can enroll in courses, take assigned quizzes and a final exam, and receive automated evaluations. Built with **.NET Core**, **Entity Framework Core**, and adhering to clean architectural principles.
+**Examination System** is a robust backend API designed for managing online exams, courses, students, and instructors. Built with **.NET 10** and **N-Tier Architecture**, it ensures strict separation of concerns, high testability, and enterprise-grade scalability. It supports automated grading, dynamic random exam generation, and role-based access control.
 
 ---
 
 ## ✨ Highlighted Features
 
-- **🧑‍🏫 Role-Based Workflows**: Distinct capabilities for `Instructors` (manage courses, questions, exams) and `Students` (take exams, view results).
-- **🔒 Security & Identity**: Currently migrating to **ASP.NET Core Identity** for robust, standard-compliant authentication and authorization, replacing custom implementations.
-- **📚 Course & Enrollment Management**: Instructors can create courses and assign students to them. Students must be enrolled before taking exams.
-- **📝 Intelligent Exam Generation**: 
-  - **Manual Assignment**: Instructors can hand-pick questions for an exam.
-  - **Automatic Assignment**: The system can automatically generate an exam, intelligently balancing questions based on their difficulty level (Simple, Medium, Hard).
-- **🛡️ Strict Business Rules**: 
-  - Instructors are securely isolated to view only the courses, questions, and exams they created.
-  - Students can take multiple quizzes but are restricted to taking **only one final exam** per course.
-- **📊 Automated Evaluation**: System instantly evaluates submitted exams and calculates scores for students to view immediately.
+- **🏢 N-Tier Architecture**: Strict separation of concerns keeping the Presentation, Business Logic, and Data Access layers independent.
+- **🎲 Dynamic Random Exams**: Ability to automatically generate random exams based on specific configurations (question counts, difficulty levels, and grades per course).
+- **💯 Automated Grading Engine**: Secure evaluation of submitted student answers against correct choices, calculating final grades automatically.
+- **🗄️ Repository Pattern**: Implementing `GenericRepository` alongside specific repositories to completely decouple data access logic from business services.
+- **🔐 Security & Identity**: Comprehensive JWT-based Authentication and Authorization leveraging ASP.NET Core Identity for Role Management (Admin, Instructor, Student).
+- **🗺️ Object Mapping**: Using `AutoMapper` to map between Domain Entities, DTOs, and ViewModels smoothly.
+- **🧪 Comprehensive Unit Testing**: 30+ tests validating all major business logic services using Moq and FluentAssertions.
 
 ---
 
 ## 🏗️ Architecture
 
-Following modern enterprise patterns, the system is designed to decouple business logic from infrastructure and presentation.
-
 ```text
 ┌─────────────────────────────────────────────┐
-│          ExaminationSystem.API              │  ← Presentation Layer (Controllers)
+│             ExaminationSystem               │  ← Presentation Layer (API)
+│          Controllers · Middlewares          │
 └─────────────────┬───────────────────────────┘
                   │
 ┌─────────────────▼───────────────────────────┐
-│          ExaminationSystem.BLL              │  ← Business Logic Layer (Services/Handlers)
+│           ExaminationSystem.BLL             │  ← Business Logic Layer (BLL)
+│       Services · DTOs · AutoMapper          │
 └─────────────────┬───────────────────────────┘
                   │
 ┌─────────────────▼───────────────────────────┐
-│          ExaminationSystem.DAL              │  ← Data Access Layer (EF Core, Repositories)
+│           ExaminationSystem.DAL             │  ← Data Access Layer (DAL)
+│   DbContext · Repositories · Models/Entities│
 └─────────────────────────────────────────────┘
 ```
 
-> **Note:** The architecture is designed to support the separation of concerns, making the system highly testable and maintainable as it scales.
+## 🏗️ Architecture Decision Records (ADRs)
+
+> *"Programming is no longer just code that runs.. Programming has become documenting your thinking and architecture for your decisions."*
+
+Here are the key architectural questions and decisions made during the design phase:
+
+### 1. Why N-Tier Architecture?
+- **Decision:** Use N-Tier Architecture.
+- **Advantages:** It is highly intuitive, providing a clean and direct separation between the Database, Business Rules, and API endpoints. It keeps the project easy to onboard for new developers while still allowing for strict dependency flows (API -> BLL -> DAL).
+- **Trade-offs:** Compared to Onion/Clean architecture, the Domain (Models) is tied to the DAL rather than sitting at the center, but this trade-off is acceptable for a data-centric application heavily relying on Entity Framework Core.
+
+### 2. Why ASP.NET Core Identity?
+- **Decision:** Migrate from Custom Auth to ASP.NET Core Identity.
+- **Advantages:** Provides battle-tested security for hashing passwords, generating tokens, managing user stores, and role-based authorization without reinventing the wheel.
+- **Integration:** Seamlessly ties into `UserManager<User>` and `RoleManager<IdentityRole>`, allowing for robust JWT token generation and role verification endpoints.
+
+### 3. Why Generic Repository Pattern?
+- **Decision:** Centralize data operations using `IRepository<T>`.
+- **Advantages:** Drastically reduces boilerplate code across the Data Access Layer. Standard operations (`AddAsync`, `CheckExistsByConditionAsync`, `SoftDelete`) are implemented once, making the Business Logic Layer highly testable via Moq.
 
 ---
 
-## 🗄️ Database (Entity Relationship)
+## 🗄️ Database
 
 ```mermaid
 erDiagram
     User {
-        int ID PK
-        string FullName
+        string Id PK
+        string FirstName
+        string LastName
+        string UserName
         string Email
-        string Role "Instructor/Student"
+    }
+    Student {
+        int ID PK
+        string Name
+        string ApplicationUserId FK
+    }
+    Instructor {
+        int ID PK
+        string Name
+        string ApplicationUserId FK
     }
     Course {
         int ID PK
         string Name
-        int InstructorId FK
+        string Description
+        int Hours
+    }
+    StudentCourse {
+        int ID PK
+        int StudentID FK
+        int CourseID FK
     }
     Exam {
         int ID PK
+        string Name
+        string Type
+        datetime Date
+        int DurationInMinutes
         int CourseId FK
-        string Title
-        string Type "Quiz/Final"
-        int TotalQuestions
+        int InstructorId FK
     }
     Question {
         int ID PK
-        string Content
-        string Level "Simple/Medium/Hard"
-        int InstructorId FK
+        string Title
+        string Level
+        int CourseId FK
     }
     Choice {
         int ID PK
+        string Text
+        bool IsCorrectChoice
         int QuestionId FK
-        string Content
-        boolean IsCorrect
-    }
-    CourseStudent {
-        int CourseId FK
-        int StudentId FK
-    }
-    ExamStudent {
-        int ExamId FK
-        int StudentId FK
     }
     ExamQuestion {
+        int ID PK
         int ExamId FK
         int QuestionId FK
+        decimal Grade
     }
-    Result {
+    ExamStudent {
         int ID PK
         int ExamId FK
         int StudentId FK
-        decimal Score
+        decimal FinalGrade
     }
 
-    User ||--o{ Course : "Creates (Instructor)"
-    User ||--o{ Question : "Creates (Instructor)"
-    Course ||--o{ Exam : "Has"
-    Question ||--o{ Choice : "Has"
-    Course ||--o{ CourseStudent : "Enrolls"
-    User ||--o{ CourseStudent : "Enrolled (Student)"
-    Exam ||--o{ ExamStudent : "Assigned to"
-    User ||--o{ ExamStudent : "Takes (Student)"
-    Exam ||--o{ ExamQuestion : "Contains"
-    Question ||--o{ ExamQuestion : "Included in"
-    Exam ||--o{ Result : "Yields"
-    User ||--o{ Result : "Achieves (Student)"
+    User ||--o| Student : "1:1"
+    User ||--o| Instructor : "1:1"
+    Student ||--o{ StudentCourse : "1:N"
+    Course ||--o{ StudentCourse : "1:N"
+    Course ||--o{ Exam : "1:N"
+    Instructor ||--o{ Exam : "1:N"
+    Course ||--o{ Question : "1:N"
+    Question ||--o{ Choice : "1:N"
+    Exam ||--o{ ExamQuestion : "1:N"
+    Question ||--o{ ExamQuestion : "1:N"
+    Exam ||--o{ ExamStudent : "1:N"
+    Student ||--o{ ExamStudent : "1:N"
 ```
 
 ---
@@ -132,45 +161,116 @@ erDiagram
 
 | Technology | Purpose |
 |------------|---------|
-| **.NET Core** | Primary backend framework |
-| **ASP.NET Core Identity** | Authentication & Authorization *(In Progress)* |
-| **Entity Framework Core** | Code-First ORM for Data Access |
-| **SQL Server** | Primary relational database |
+| **.NET 10 / ASP.NET Core** | Web API framework |
+| **Entity Framework Core** | ORM + Code-First migrations |
+| **SQL Server** | Primary database |
+| **ASP.NET Core Identity** | User Management & Roles |
+| **AutoMapper** | Object-to-object mapping (Entities ↔ DTOs) |
+| **JWT** | Secure authentication and authorization |
+| **Moq & NUnit** | Unit testing |
 
 ---
 
-## 📌 Roadmap & Status
+## 📂 Project Structure
 
-This project is actively under development. Below are the key requirements extracted from the SRS and their current implementation status.
+```text
+ExaminationSystem/
+│
+├── 🌐 ExaminationSystem          # API Layer (Controllers, Program.cs)
+├── ⚙️ ExaminationSystem.BLL      # Business Logic (Services, DTOs, AutoMapper)
+├── 🔌 ExaminationSystem.DAL      # Data Access (Models, DbContext, Repositories)
+└── 🧪 ExaminationSys.UnitTests   # NUnit Test Project for Services
+```
 
-- [x] Initial Project Architecture Setup (API, BLL, DAL)
-- [x] Base Database Entities and EF Core Configurations
-- [ ] **Migrate to ASP.NET Core Identity** *(Replacing custom authorization)* 🔄
-- [ ] **Course Management:** Create, Edit, Delete, and Student Enrollment functionality
-- [ ] **Question Bank Management:** Add/Edit/Delete questions with Difficulty Levels (Simple, Medium, Hard) and multiple choices
-- [ ] **Data Isolation:** Ensure instructors can only view/manage their own courses and questions
-- [ ] **Exam Management:** Support for both `Quiz` and `Final` exam types
-- [ ] **Exam Generation Logic:** 
-  - [ ] Manual Question Assignment
-  - [ ] Automatic Question Assignment (balancing difficulty levels)
-- [ ] **Student Exam Rules Engine:** 
-  - [ ] Verify student is assigned to the course before taking exams
-  - [ ] Enforce rule: Multiple Quizzes allowed, but **only one Final Exam**
-- [ ] **Result Evaluation:** Automated grading system upon exam submission
+---
+
+## 📚 API Documentation
+
+```mermaid
+mindmap
+  root((API v1))
+    Auth
+      POST /Auth/register
+      POST /Auth/login
+    Courses
+      GET /Courses
+      GET /Courses/id
+      POST /Courses
+      PUT /Courses/id
+      DELETE /Courses/id
+    Exams
+      POST /Exams
+      GET /Exams/id
+      PUT /Exams/id
+      DELETE /Exams/id
+      POST /Exams/random
+      POST /Exams/submit
+      GET /Exams/id/grades
+    Questions
+      GET /Questions/id
+      POST /Questions
+      PUT /Questions/id
+      DELETE /Questions/id
+    Choices
+      POST /Choices
+      PUT /Choices/id
+      DELETE /Choices/id
+    Users
+      GET /Users
+      GET /Users/id
+      POST /Users
+      PUT /Users/id
+      DELETE /Users/id
+```
+
+---
+
+## 🧪 Unit Testing
+
+### 🗂️ Test Project Structure
+All unit tests live in the `ExaminationSys.UnitTests` project and ensure 100% service-level logic coverage across the BLL.
+
+| Tool | Role |
+|---|---|
+| **NUnit** | Test framework (`[TestFixture]`, `[Test]`, `[SetUp]`) |
+| **Moq** | Mocking generic repositories and dependencies |
+| **FluentAssertions** | Expressive, readable assertions |
+| **MockQueryable** | Mocking asynchronous EF Core LINQ extensions |
+
+### ✅ Test Results Summary
+
+```text
+Passed!  - Failed: 0, Passed: 32, Skipped: 0, Total: 32
+```
+
+| Test File | Tests | Core Logic Covered |
+|---|---|---|
+| `QuestionServiceTests.cs` | 3 | Add, Delete, Exception Handling |
+| `ExamServiceTests.cs` | 2 | Add, Cross-Service Validation |
+| `ExamStudentServiceTests.cs` | 3 | Add, Check Assignation |
+| `CourseServiceTests.cs` | 4 | Add, GetById, Failure scenarios |
+| `ExamQuestionServiceTests.cs` | 3 | Add, Delete, IsExist |
+| `StudnetCourseServiceTests.cs`| 3 | Assign, Validation checks |
+| `UserServiceTests.cs` | 3 | IsExist, GetById, Identity Store Mocking |
+| `AuthServiceTests.cs` | 3 | Register, GetToken, Role validation |
+| `StudentServiceTests.cs` | 2 | Check Existence |
+| `InstructorServiceTests.cs` | 2 | Check Existence |
+| `ChoiceServiceTests.cs` | 4 | Add, Delete by Question, Validation |
+| **Total** | **32** | |
 
 ---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
-- .NET SDK
+- .NET SDK (10.0 or later)
 - SQL Server
 
 ### Setup
 
 1. **Clone the repository:**
    ```bash
-   git clone <your-repo-url>
+   git clone https://github.com/Abdelrhman-elsaeed/ExaminationSystem.git
    cd ExaminationSystem
    ```
 
@@ -178,22 +278,23 @@ This project is actively under development. Below are the key requirements extra
    Update the connection string in `appsettings.json` to point to your local SQL Server instance.
 
 3. **Apply Migrations:**
-   Run EF Core migrations to build the database schema.
-   ```bash
-   dotnet ef database update
-   ```
+   Ensure your database is created and up to date by running EF Core migrations.
 
 4. **Run the API:**
    ```bash
-   dotnet run
+   dotnet run --project ExaminationSystem
    ```
+
+5. **Explore:** Open the browser and navigate to `https://localhost:<port>/swagger` to test the endpoints interactively.
 
 ---
 
 <div align="center">
 
-*This project is built following strict software requirements to deliver a seamless examination experience.*
+*This README was designed not just to explain how to run the project, but to document the engineering mindset and architectural decisions behind it.*
 
-Made with ❤️ using .NET
+**⭐ Star this repository if you find it helpful!**
+
+Made with ❤️ using .NET 10
 
 </div>
