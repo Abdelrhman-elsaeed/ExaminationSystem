@@ -1,14 +1,15 @@
 using ExaminationSystem.BLL.AutoMapper.Profiles;
 using ExaminationSystem.BLL.Helper.JWT;
-using ExaminationSystem.BLL.Services.Interfaces;
-using ExaminationSystem.Middlewares;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using ExaminationSystem.DAL.Models;
 using ExaminationSystem.BLL.Services.Implementaiton;
+using ExaminationSystem.BLL.Services.Interfaces;
 using ExaminationSystem.BLL.Validators;
+using ExaminationSystem.DAL.Models;
+using ExaminationSystem.Middlewares;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace ExaminationSystem
 {
@@ -17,6 +18,17 @@ namespace ExaminationSystem
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            // Serilog
+            builder.Logging.ClearProviders();
+            Log.Logger = new LoggerConfiguration().ReadFrom
+                .Configuration(builder.Configuration)
+                .Enrich.FromLogContext()
+                .CreateLogger();
+            builder.Host.UseSerilog();
+
+
+
 
             // Add services to the container.
             builder.Services.AddControllers();
@@ -85,6 +97,12 @@ namespace ExaminationSystem
 
 
             var app = builder.Build();
+
+            // Serilog Logs for each HTTP request
+            app.UseSerilogRequestLogging(options =>
+            {
+                options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
+            });
 
             // Error Handler Middleware
             app.UseMiddleware<GlobalErrorHandlerMiddleware>();
