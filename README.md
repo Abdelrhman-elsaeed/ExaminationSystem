@@ -40,6 +40,7 @@ The project was built with ASP.NET Core, Entity Framework Core, SQL Server, ASP.
 - **🗺️ Object Mapping**: Using `AutoMapper` to map between Domain Entities, DTOs, and ViewModels smoothly.
 - **✔️ FluentValidation Pipeline**: Completely isolated DTO validation using `FluentValidation`, automatically intercepting bad requests before they ever hit the controllers, ensuring perfectly clean APIs.
 - **🧪 Comprehensive Unit Testing**: 30+ tests validating all major business logic services using Moq and FluentAssertions.
+- **📊 Observability & Structured Logging**: Centralized and structured logging using Serilog and Seq to monitor application health, track user journeys, and quickly debug issues.
 
 ---
 
@@ -323,10 +324,6 @@ To demonstrate scalability awareness and readiness for enterprise-level demands,
 
 - **📨 Event-Driven Architecture (RabbitMQ)**
   - Offload the `SubmitExam` grading process to a background worker using a message broker. When a student submits an exam, publish an `ExamSubmittedEvent`. A consumer will pick it up, grade it asynchronously, and trigger an email notification, ensuring the API remains highly responsive during peak exam periods.
-
-- **📊 Observability & Structured Logging (Serilog + ELK/Seq)**
-  - Replace default logging with Serilog to capture rich, structured logs. 
-  - Centralize log aggregation using Elasticsearch/Kibana or Seq to monitor application health, track user journeys, and quickly debug issues in a production environment.
 
 - **📦 Containerization (Docker)**
   - Dockerize the API and its dependencies (SQL Server, Redis) into isolated containers using `docker-compose`, ensuring a consistent "works on my machine" experience across all deployment environments.
